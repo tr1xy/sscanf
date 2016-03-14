@@ -33,7 +33,7 @@
 	#error Please include <a_npc> or <a_samp> first.
 #endif
 
-#define SSCANF:%0(%1) sscanf_%0(%1);public sscanf_%0(%1)
+#define SSCANF:%0(%1) forward sscanf_%0(%1);public sscanf_%0(%1)
 
 #if defined sscanf
 	#error sscanf (possibly the PAWN version) already defined.
