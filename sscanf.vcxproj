@@ -62,7 +62,6 @@
       <DisableSpecificWarnings>4995;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <OutputFile>..\Plugins\$(ProjectName).dll</OutputFile>
       <ModuleDefinitionFile>sscanf.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -92,7 +91,6 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
-      <OutputFile>..\Plugins\$(ProjectName).dll</OutputFile>
       <ModuleDefinitionFile>sscanf.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>

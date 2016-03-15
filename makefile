@@ -7,7 +7,7 @@
 
 GPP = g++
 GCC = gcc
-SSCANF_OUTFILE = "../plugins/sscanf.so"
+SSCANF_OUTFILE = "sscanf.so"
 
 COMPILE_FLAGS = -m32 -fPIC -c -O3 -w -D LINUX -D PROJECT_NAME=\"sscanf\" -I ./SDK/amx/
 
