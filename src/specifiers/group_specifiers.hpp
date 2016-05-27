@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../specifiers.h"
-#include "../specifiers/other_specifiers.h"
-#include "../parser.h"
-#include "../errors.h"
+#include "../specifiers.hpp"
+#include "../specifiers/other_specifiers.hpp"
+#include "../parser.hpp"
+#include "../errors.hpp"
 
 #include <list>
 

@@ -1,5 +1,5 @@
-#include "string_specifier.h"
-#include "../errors.h"
+#include "string_specifier.hpp"
+#include "../errors.hpp"
 
 Environment *
 	gEnv;

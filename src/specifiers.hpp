@@ -1,8 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include "errors.h"
-#include "environment.h"
+#include "errors.hpp"
+#include "environment.hpp"
 
 typedef
 	error_t (* ReadFunction_t)(char const * &, cell &);

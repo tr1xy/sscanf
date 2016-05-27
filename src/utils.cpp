@@ -1,6 +1,6 @@
-#include "utils.h"
-#include "errors.h"
-#include "../sdk/plugin.h"
+#include "utils.hpp"
+#include "errors.hpp"
+#include <plugincommon.h>
 
 #include <stdlib.h>
 

@@ -1,19 +1,19 @@
-#include "parser.h"
-#include "utils.h"
-#include "specifiers.h"
+#include "parser.hpp"
+#include "utils.hpp"
+#include "specifiers.hpp"
 /*#include "specifiers/array_specifier.hpp"
 #include "specifiers/delim_specifier.hpp"
 #include "specifiers/group_specifiers.hpp"
 #include "specifiers/enum_specifier.hpp" // Relies on group_specifiers.
 #include "specifiers/player_specifier.hpp"*/
-#include "specifiers/string_specifier.h"
-#include "specifiers/numeric_specifier.h"
-#include "specifiers/trivial_specifiers.h"
-#include "specifiers/simple_specifiers.h"
-#include "specifiers/other_specifiers.h"
-#include "specifiers/group_specifiers.h"
-#include "specifiers/delim_specifier.h"
-#include "specifiers/specnum_specifiers.h"
+#include "specifiers/string_specifier.hpp"
+#include "specifiers/numeric_specifier.hpp"
+#include "specifiers/trivial_specifiers.hpp"
+#include "specifiers/simple_specifiers.hpp"
+#include "specifiers/other_specifiers.hpp"
+#include "specifiers/group_specifiers.hpp"
+#include "specifiers/delim_specifier.hpp"
+#include "specifiers/specnum_specifiers.hpp"
 
 Parser
 	gParser;

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "memory.h"
-#include "utils.h"
-#include "options.h"
-#include "delimiters.h"
+#include "memory.hpp"
+#include "utils.hpp"
+#include "options.hpp"
+#include "delimiters.hpp"
 #include <map>
 #include <string>
 
@@ -16,8 +16,7 @@ PUBLIC:
 		m_skipDelim(true),
 		m_options(),
 		m_memory(m),
-		m_delims(),
-		m_writing(true)
+		m_delims()
 	{
 	};
 	
@@ -27,8 +26,7 @@ PUBLIC:
 		m_skipDelim(env.m_skipDelim),
 		m_options(&env.m_options),
 		m_memory(env.m_memory),
-		m_delims(env.m_delims),
-		m_writing(env.m_writing)
+		m_delims(env.m_delims)
 	{
 	};
 	
@@ -67,17 +65,13 @@ PUBLIC:
 		SetNextString(char const * val, size_t idx = 0, bool pack = false) { return m_memory->SetNextString(val, idx, pack); };
 	
 	error_t
-		Skip(int n, int part = 0, bool read = false)
-	{
-		if (read || m_writing) return m_memory->Skip(n, part);
-		return OK;
-	};
+		Skip(int n, int part = 0, bool read = false) { return m_memory->Skip(n, part); };
 	
 	virtual int
 		Poll() { return m_memory->Poll(); };
 	
 	virtual void
-		ZeroRead() { m_skipDelim = false; ;
+		ZeroRead() { m_skipDelim = false; };
 	
 	void
 		SetOption(option_t option, int const value) { m_options.Set(option, value); };
@@ -96,19 +90,12 @@ PUBLIC:
 	void
 		SetMemory(Memory * mem) { m_memory = mem; };
 	
-	void
-		SetQuiet(bool quiet) { m_writing = !quiet; };
-	
-	bool
-		GetQuiet() { return m_writing; };
-	
 PRIVATE:
 	Options
 		m_options;
 	
 	bool
-		m_skipDelim,
-		m_writing;
+		m_skipDelim;
 	
 	Memory *
 		m_memory;

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <malloc.h>
-#include "../sdk/plugin.h"
-#include "errors.h"
+#include <amx/amx2.h>
+#include "errors.hpp"
 
 // This class is pretty much the main work-horse of the whole plugin!
 class Utils

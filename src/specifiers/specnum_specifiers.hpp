@@ -1,6 +1,6 @@
 #pragma once
 
-#include "simple_specifiers.h"
+#include "simple_specifiers.hpp"
 #include <limits>
 
 class LogicalSpecifier : public SimpleSpecifier

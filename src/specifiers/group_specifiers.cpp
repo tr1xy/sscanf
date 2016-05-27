@@ -1,10 +1,10 @@
 #pragma once
 
-#include "group_specifiers.h"
-#include "../specifiers/other_specifiers.h"
-#include "../parser.h"
-#include "../errors.h"
-#include "../memory.h"
+#include "group_specifiers.hpp"
+#include "../specifiers/other_specifiers.hpp"
+#include "../parser.hpp"
+#include "../errors.hpp"
+#include "../memory.hpp"
 
 error_t
 	QuietGroup::

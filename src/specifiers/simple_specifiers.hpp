@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../specifiers.h"
+#include "../specifiers.hpp"
 
 class SimpleSpecifier : public Specifier
 {

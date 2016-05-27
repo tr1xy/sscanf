@@ -1,4 +1,4 @@
-#include "../specifiers.h"
+#include "../specifiers.hpp"
 
 class DelimSpecifier : public Specifier
 {

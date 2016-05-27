@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "../sscanf.h"
+#include "sscanf.hpp"
 
 enum E_SSCANF_ERROR
 {

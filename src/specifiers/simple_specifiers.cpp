@@ -1,4 +1,4 @@
-#include "simple_specifiers.h"
+#include "simple_specifiers.hpp"
 
 int
 	CountHyphens(char const * str)

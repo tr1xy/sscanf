@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../specifiers.h"
-#include "../utils.h"
-#include "../parser.h"
-#include "../options.h"
+#include "../specifiers.hpp"
+#include "../utils.hpp"
+#include "../parser.hpp"
+#include "../options.hpp"
 
 class LiteralSpecifier : public Specifier
 {

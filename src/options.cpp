@@ -1,4 +1,4 @@
-#include "options.h"
+#include "options.hpp"
 #include <string.h>
 
 #define OPTION(n) if (!strcmp(name, #n)) return OPTION_##n

@@ -26,3 +26,10 @@
 *.exe
 *.out
 *.app
+
+#build folder
+build/
+BUILD/
+
+#Linux invisible files
+*.

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <malloc.h>
-#include "../sdk/plugin.h"
-#include "errors.h"
+#include <amx/amx2.h>
+#include "errors.hpp"
 
 class Memory
 {

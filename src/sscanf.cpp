@@ -1,14 +1,14 @@
 //sscanf.cpp
 
-#include "sscanf.h"
+#include "sscanf.hpp"
 
-#include "src/parser.h"
-#include "src/memory.h"
-#include "src/specifiers.h"
-#include "src/errors.h"
+#include "parser.hpp"
+#include "memory.hpp"
+#include "specifiers.hpp"
+#include "errors.hpp"
 
-#include <malloc.h>
-#include "sdk/plugin.h"
+#include <plugincommon.h>
+#include <amx/amx2.h>
 
 logprintf_t
 	logprintf,

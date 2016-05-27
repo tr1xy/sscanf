@@ -1,0 +1,3 @@
+#pragma once
+
+#define SSCANF_PLUGIN_VERSION "@SSCANF_PLUGIN_VERSION@"
