@@ -1460,8 +1460,10 @@ static cell AMX_NATIVE_CALL
 		logprintf("sscanf error: SSCANF_SetPlayerName has incorrect parameters.");
 		return 0;
 	}
-	DoName(amx, params[1], params[2]);
-	return SetPlayerName(amx, params);
+	cell return_val = SetPlayerName(amx, params);
+	if (return_val == 1) // name has been successfully set
+		DoName(amx, params[1], params[2]);
+	return return_val;
 }
 
 //----------------------------------------------------------
