@@ -279,7 +279,7 @@ static stock
 #define extract%0->%1; EXTRN%1;unformat(_:EXTRZ:EXTRV:EXTRX:%0,##,%1,,);
 #define unformat(_:EXTRZ:EXTRV:EXTRX:%0,##,%1);%2else if (unformat(_:EXTRV:EXTRX:%0,##,%1))
 
-#define EXTRV:EXTRX:%0<%3>##,%9new%1,%2) EXTRY:%0##P<%3>,|||%1|||%2)
+#define EXTRV:EXTRX:%0<%3>%4##,%9new%1,%2) EXTRY:%0%4##P<%3>,|||%1|||%2)
 #define EXTRX:%0##,%9new%1,%2) EXTRY:%0##,|||%1|||%2)
 #define EXTRY: EXTR8:EXTR9:EXTR0:EXTR1:EXTR2:EXTR3:EXTR4:
 
