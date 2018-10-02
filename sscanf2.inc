@@ -1,5 +1,5 @@
 /*
- *  sscanf 2.8.2
+ *  sscanf 2.8.3
  *  Created by Y_Less, updated by Emmet_.
  *
  *  Version: MPL 1.1
