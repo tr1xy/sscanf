@@ -319,17 +319,17 @@ static stock
 #define EXTRN%0new%1; new%1;
 
 #if !defined string
-    #define string:
+    #define string:%0;unformat(%1) %0;unformat(%1)
 #endif
 
-#define player:
+#define player:%0;unformat(%1) %0;unformat(%1)
 
 #define hex:%0;unformat(%1) %0;unformat(%1)
 #define hex_EXTRO:%0#%1,%2|||%3=%9|||%4,%5) EXTRY:%0#%1H"("#%9")"#,%2,%3|||%4|||%5)
 #define hex_EXTRN:%0#%1,%2|||%3|||%4,%5) EXTRY:%0#%1h,%2,%3|||%4|||%5)
 #define hex_EXTRW:%0#%1,%2|||%3[%7]|||%4,%5) EXTRY:%0#%1a<h>[%7],%2,%3|||%4|||%5)
 
-#define bin:
+#define bin:%0;unformat(%1) %0;unformat(%1)
 #define bin_EXTRO:%0#%1,%2|||%3=%9|||%4,%5) EXTRY:%0#%1B"("#%9")"#,%2,%3|||%4|||%5)
 #define bin_EXTRN:%0#%1,%2|||%3|||%4,%5) EXTRY:%0#%1b,%2,%3|||%4|||%5)
 #define bin_EXTRW:%0#%1,%2|||%3[%7]|||%4,%5) EXTRY:%0#%1a<b>[%7],%2,%3|||%4|||%5)
