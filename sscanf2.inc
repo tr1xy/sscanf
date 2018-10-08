@@ -319,7 +319,7 @@ static stock
 #define EXTRN%0new%1; new%1;
 
 #if !defined string
-    #define string:%0;unformat(%1) %0;unformat(%1)
+    #define string:
 #endif
 
 #define player:%0;unformat(%1) %0;unformat(%1)
