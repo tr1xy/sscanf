@@ -82,20 +82,19 @@ AMX *
 
 #define SAVE_VALUE(m)       \
 	if (doSave)             \
-		amx_GetAddr(amx, params[paramPos++], &cptr), *cptr = m
+		*args.Next() = m
 
 #define SAVE_VALUE_F(m)     \
 	if (doSave) {           \
 		float f = (float)m; \
-		amx_GetAddr(amx, params[paramPos++], &cptr), *cptr = amx_ftoc(f); }
+		*args.Next() = amx_ftoc(f); }
 
 // Based on amx_StrParam but using 0 length strings.  This can't be inline as
 // it uses alloca - it could be written to use malloc instead, but that would
 // require memory free code all over the place!
 #define STR_PARAM(amx,param,result)                                                          \
 	do {                                                                                     \
-		cell * amx_cstr_; int amx_length_;                                                   \
-		amx_GetAddr((amx), (param), &amx_cstr_);                                             \
+		cell * amx_cstr_ = args.Next(); int amx_length_;                                     \
 		amx_StrLen(amx_cstr_, &amx_length_);                                                 \
 		if (amx_length_ > 0) {                                                               \
 			if (((result) = (char *)alloca((amx_length_ + 1) * sizeof (*(result)))) != NULL) \
@@ -112,7 +111,7 @@ AMX *
 	if (Do##n(&string, &b)) {    \
 		SAVE_VALUE((cell)b);     \
 		break; }                 \
-	RestoreOpts(defaultOpts);      \
+	RestoreOpts(defaultOpts);    \
 	return SSCANF_FAIL_RETURN; }
 
 #define DOV(m,n)                 \
@@ -168,7 +167,7 @@ AMX *
 	SkipDefault(&format);
 
 bool
-	DoK(AMX * amx, char ** defaults, char ** input, cell * cptr, bool optional, bool all);
+	DoK(AMX * amx, char ** defaults, char ** input, struct args_s * args, bool optional, bool all);
 
 void
 	DoOptions(char *, cell);
@@ -206,16 +205,18 @@ static cell AMX_NATIVE_CALL
 	// by one (OBOE - Out By One Error) due to params[0] being the parameter
 	// count, not an actual parameter.
 	const int
-		paramCount = ((int)params[0] / 4) + 1;
+		count = ((int)params[0] / 4) + 1;
 	// Could add a check for only 3 parameters here - I can't think of a time
 	// when you would not want any return values at all, but that doesn't mean
 	// they don't exist - you could just want to check but not save the format.
 	// Update - that is now a possibility with the '{...}' specifiers.
-	if (paramCount < (2 + 1))
+	if (count < (2 + 1))
 	{
 		logprintf("sscanf error: Missing required parameters.");
 		return SSCANF_FAIL_RETURN;
 	}
+	struct args_s
+		args{ amx, params, count };
 	//else if (paramCount == (2 + 1))
 	//{
 		// Only have an input and a specifier - better hope the whole specifier
@@ -242,8 +243,6 @@ static cell AMX_NATIVE_CALL
 	// Current parameter to save data to.
 	int
 		paramPos = 3;
-	cell *
-		cptr;
 	InitialiseDelimiter();
 	// Skip leading space.
 	SkipWhitespace(&string);
@@ -402,13 +401,12 @@ static cell AMX_NATIVE_CALL
 							dest;
 						int
 							length;
-						if (DoSD(&format, &dest, &length))
+						if (DoSD(&format, &dest, &length, &args))
 						{
 							// Send the string to PAWN.
 							if (doSave)
 							{
-								amx_GetAddr(amx, params[paramPos++], &cptr);
-								amx_SetString(cptr, dest, 0, 0, length);
+								amx_SetString(args.Next(), dest, 0, 0, length);
 							}
 						}
 						break;
@@ -420,15 +418,14 @@ static cell AMX_NATIVE_CALL
 					{
 						// Get the length.
 						int
-							length = GetLength(&format, false);
+							length = GetLength(&format, false, &args);
 						char *
 							dest;
-						DoS(&string, &dest, length, IsEnd(*format) || (!doSave && *format == '}' && IsEnd(*(format + 1))));
+						DoS(&string, &dest, length, IsEnd(*format) || (!doSave && *format == '}' && IsEnd(*(format + 1))), &args);
 						// Send the string to PAWN.
 						if (doSave)
 						{
-							amx_GetAddr(amx, params[paramPos++], &cptr);
-							amx_SetString(cptr, dest, 0, 0, length);
+							amx_SetString(args.Next(), dest, 0, 0, length);
 						}
 					}
 					break;
@@ -441,7 +438,7 @@ static cell AMX_NATIVE_CALL
 						if (*format == '[')
 						{
 							int
-								len = GetLength(&format, true);
+								len = GetLength(&format, true, &args);
 							if (gOptions & 1)
 							{
 								// Incompatible combination.
@@ -455,7 +452,8 @@ static cell AMX_NATIVE_CALL
 							}
 							else if (doSave)
 							{
-								amx_GetAddr(amx, params[paramPos++], &cptr);
+								cell *
+									cptr = args.Next();
 								*cptr++ = b;
 								*cptr = g_iInvalid;
 							}
@@ -472,7 +470,7 @@ static cell AMX_NATIVE_CALL
 					if (*format == '[')
 					{
 						int
-							len = GetLength(&format, true);
+							len = GetLength(&format, true, &args);
 						if (len < 2)
 						{
 							logprintf("sscanf error: 'u[len]' length under 2.");
@@ -489,7 +487,8 @@ static cell AMX_NATIVE_CALL
 									tstr;
 								// Don't detect multiple results.
 								gOptions &= ~4;
-								amx_GetAddr(amx, params[paramPos++], &cptr);
+								cell *
+									cptr = args.Next();
 								while (--len)
 								{
 									tstr = string;
@@ -554,7 +553,8 @@ static cell AMX_NATIVE_CALL
 							}
 							else if (doSave)
 							{
-								amx_GetAddr(amx, params[paramPos++], &cptr);
+								cell *
+									cptr = args.Next();
 								*cptr++ = b;
 								*cptr = g_iInvalid;
 							}
@@ -588,7 +588,8 @@ static cell AMX_NATIVE_CALL
 									tstr;
 								// Don't detect multiple results.
 								gOptions &= ~4;
-								amx_GetAddr(amx, params[paramPos++], &cptr);
+								cell *
+									cptr = args.Next();
 								while (--len)
 								{
 									tstr = string;
@@ -653,7 +654,8 @@ static cell AMX_NATIVE_CALL
 							}
 							else if (doSave)
 							{
-								amx_GetAddr(amx, params[paramPos++], &cptr);
+								cell *
+									cptr = args.Next();
 								*cptr++ = b;
 								*cptr = g_iInvalid;
 							}
@@ -685,9 +687,10 @@ static cell AMX_NATIVE_CALL
 							{
 								char *
 									tstr;
+								cell *
+									cptr = args.Next();
 								// Don't detect multiple results.
 								gOptions &= ~4;
-								amx_GetAddr(amx, params[paramPos++], &cptr);
 								while (--len)
 								{
 									tstr = string;
@@ -731,79 +734,31 @@ static cell AMX_NATIVE_CALL
 					break;
 				case 'A':
 					// We need the default values here.
-					if (doSave)
+					if (DoA(&format, &string, &args, true, doSave))
 					{
-						amx_GetAddr(amx, params[paramPos++], &cptr);
-						if (DoA(&format, &string, cptr, true))
-						{
-							break;
-						}
-					}
-					else
-					{
-						// Pass a NULL pointer so data isn't saved anywhere.
-						if (DoA(&format, &string, NULL, true))
-						{
-							break;
-						}
+						break;
 					}
 					RestoreOpts(defaultOpts);
 					return SSCANF_FAIL_RETURN;
 				case 'a':
-					if (doSave)
+					if (DoA(&format, &string, &args, false, doSave))
 					{
-						amx_GetAddr(amx, params[paramPos++], &cptr);
-						if (DoA(&format, &string, cptr, false))
-						{
-							break;
-						}
-					}
-					else
-					{
-						// Pass a NULL pointer so data isn't saved anywhere.
-						if (DoA(&format, &string, NULL, false))
-						{
-							break;
-						}
+						break;
 					}
 					RestoreOpts(defaultOpts);
 					return SSCANF_FAIL_RETURN;
 				case 'E':
 					// We need the default values here.
-					if (doSave)
+					if (DoE(&format, &string, &args, true, doSave))
 					{
-						amx_GetAddr(amx, params[paramPos++], &cptr);
-						if (DoE(&format, &string, cptr, true))
-						{
-							break;
-						}
-					}
-					else
-					{
-						// Pass a NULL pointer so data isn't saved anywhere.
-						if (DoE(&format, &string, NULL, true))
-						{
-							break;
-						}
+						break;
 					}
 					RestoreOpts(defaultOpts);
 					return SSCANF_FAIL_RETURN;
 				case 'e':
-					if (doSave)
+					if (DoE(&format, &string, &args, false, doSave))
 					{
-						amx_GetAddr(amx, params[paramPos++], &cptr);
-						if (DoE(&format, &string, cptr, false))
-						{
-							break;
-						}
-					}
-					else
-					{
-						// Pass a NULL pointer so data isn't saved anywhere.
-						if (DoE(&format, &string, NULL, false))
-						{
-							break;
-						}
+						break;
 					}
 					RestoreOpts(defaultOpts);
 					return SSCANF_FAIL_RETURN;
@@ -820,8 +775,7 @@ static cell AMX_NATIVE_CALL
 					// We need the default values here.
 					if (doSave)
 					{
-						amx_GetAddr(amx, params[paramPos++], &cptr);
-						if (DoK(amx, &format, &string, cptr, true, consume_all))
+						if (DoK(amx, &format, &string, &args, true, consume_all))
 						{
 							break;
 						}
@@ -844,8 +798,7 @@ static cell AMX_NATIVE_CALL
 						|| (!doSave && *after_spec == '}' && IsEnd(*(after_spec + 1)));
 					if (doSave)
 					{
-						amx_GetAddr(amx, params[paramPos++], &cptr);
-						if (DoK(amx, &format, &string, cptr, false, consume_all))
+						if (DoK(amx, &format, &string, &args, false, consume_all))
 						{
 							break;
 						}
@@ -1027,65 +980,23 @@ static cell AMX_NATIVE_CALL
 				case 'R':
 					DE(int, R)
 				case 'A':
-					if (doSave)
+					if (DoA(&format, NULL, &args, true, doSave))
 					{
-						amx_GetAddr(amx, params[paramPos++], &cptr);
-						if (DoA(&format, NULL, cptr, true))
-						{
-							break;
-						}
-					}
-					else
-					{
-						// Pass a NULL pointer so data isn't saved anywhere.
-						// Also pass NULL data so it knows to only collect the
-						// default values.
-						if (DoA(&format, NULL, NULL, true))
-						{
-							break;
-						}
+						break;
 					}
 					RestoreOpts(defaultOpts);
 					return SSCANF_FAIL_RETURN;
 				case 'E':
-					if (doSave)
+					if (DoE(&format, NULL, &args, true, doSave))
 					{
-						amx_GetAddr(amx, params[paramPos++], &cptr);
-						if (DoE(&format, NULL, cptr, true))
-						{
-							break;
-						}
-					}
-					else
-					{
-						// Pass a NULL pointer so data isn't saved anywhere.
-						// Also pass NULL data so it knows to only collect the
-						// default values.
-						if (DoE(&format, NULL, NULL, true))
-						{
-							break;
-						}
+						break;
 					}
 					RestoreOpts(defaultOpts);
 					return SSCANF_FAIL_RETURN;
 				case 'K':
-					if (doSave)
+					if (DoK(amx, &format, NULL, &args, true, doSave, false))
 					{
-						amx_GetAddr(amx, params[paramPos++], &cptr);
-						if (DoK(amx, &format, NULL, cptr, true, false))
-						{
-							break;
-						}
-					}
-					else
-					{
-						// Pass a NULL pointer so data isn't saved anywhere.
-						// Also pass NULL data so it knows to only collect the
-						// default values.
-						if (DoK(amx, &format, NULL, NULL, true, false))
-						{
-							break;
-						}
+						break;
 					}
 					RestoreOpts(defaultOpts);
 					return SSCANF_FAIL_RETURN;
@@ -1122,13 +1033,12 @@ static cell AMX_NATIVE_CALL
 							dest;
 						int
 							length;
-						if (DoSD(&format, &dest, &length))
+						if (DoSD(&format, &dest, &length, &args))
 						{
 							// Send the string to PAWN.
 							if (doSave)
 							{
-								amx_GetAddr(amx, params[paramPos++], &cptr);
-								amx_SetString(cptr, dest, 0, 0, length);
+								amx_SetString(args.Next(), dest, 0, 0, length);
 							}
 						}
 					}

@@ -813,7 +813,7 @@ bool
 }
 
 bool
-	DoSD(char ** input, char ** ret, int * length)
+	DoSD(char ** input, char ** ret, int * length, struct args_s * args)
 {
 	if (!FindDefaultStart(input))
 	{
@@ -859,7 +859,7 @@ bool
 		// Skip the final character.
 		*input = string + 1;
 		// NOW get the length.
-		*length = GetLength(input, false);
+		*length = GetLength(input, false, args);
 	}
 	else
 	{

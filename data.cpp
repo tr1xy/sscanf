@@ -62,6 +62,23 @@ void
 int
 	gOptions = 0;
 
+cell * args_s::Next()
+{
+	cell * cptr;
+	amx_GetAddr(Amx, Params[Pos++], &cptr);
+	return cptr;
+};
+
+void args_s::Mark()
+{
+	Marker = Pos;
+};
+
+void args_s::Restore()
+{
+	Pos = Marker;
+};
+
 void
 	RestoreOpts(int opt)
 {
@@ -924,26 +941,37 @@ void
 }
 
 int
-	GetLength(char ** const input, bool error)
+	GetLength(char ** const input, bool error, struct args_s * args)
 {
 	if (**input == '[')
 	{
 		++(*input);
-		int
-			length = GetDec(input);
 		char *
-			str = *input;
-		if (length <= 0)
+			str;
+		int
+			length;
+		if (**input == '*')
 		{
-			if (error)
+			// Length loaded from a parameter.
+			str = *input + 1;
+			length = *args->Next();
+		}
+		else
+		{
+			length = GetDec(input);
+			str = *input;
+			if (length <= 0)
 			{
-				length = 0;
-				logprintf("sscanf error: Invalid data length.");
-			}
-			else
-			{
-				length = SSCANF_MAX_LENGTH;
-				logprintf("sscanf warning: Invalid data length.");
+				if (error)
+				{
+					length = 0;
+					logprintf("sscanf error: Invalid data length.");
+				}
+				else
+				{
+					length = SSCANF_MAX_LENGTH;
+					logprintf("sscanf warning: Invalid data length.");
+				}
 			}
 		}
 		if (*str == ']')

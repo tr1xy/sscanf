@@ -30,4 +30,4 @@
 #include "SDK/plugincommon.h"
 
 bool
-	DoE(char ** defaults, char ** input, cell * cptr, bool optional);
+	DoE(char ** defaults, char ** input, cell * cptr, bool optional, bool doSave);

@@ -28,69 +28,73 @@
 
 #include "SDK/amx/amx.h"
 
-#include "utils.h"
-#include "specifiers.h"
-#include "data.h"
 #include "sscanf.h"
+#include "utils.h"
+#include "data.h"
+#include "specifiers.h"
 
 extern logprintf_t
 	logprintf;
 
-#define SAVE_VALUE(m)            \
-	if (cptr)                    \
+#define GET_CPTR()                      \
+	if (doSave)                         \
+		cptr = args->Next()
+
+#define SAVE_VALUE(m)                   \
+	if (doSave)                         \
 		*cptr++ = m
 
-#define SAVE_VALUE_F(m)          \
-	if (cptr) {                  \
-		float f = (float)m;      \
+#define SAVE_VALUE_F(m)                 \
+	if (doSave) {                       \
+		float f = (float)m;             \
 		*cptr++ = amx_ftoc(f); }
 
-#define UPDATE_VALUES(m)         \
-	if (defaults) {              \
-		if (count) {             \
-			diff.c = m - last.c; \
-			last.c = m;          \
-		} else {                 \
-			last.c = m;          \
-			diff.c = 0; } }      \
-	SkipOneSpacer(&string);      \
+#define UPDATE_VALUES(m)                \
+	if (defaults) {                     \
+		if (count) {                    \
+			diff.c = m - last.c;        \
+			last.c = m;                 \
+		} else {                        \
+			last.c = m;                 \
+			diff.c = 0; } }             \
+	SkipOneSpacer(&string);             \
 	++count
 
-#define UPDATE_VALUES_F(m)       \
-	if (defaults) {              \
-		if (count) {             \
-			diff.d = m - last.d; \
-			last.d = m;          \
-		} else {                 \
-			last.d = m;          \
-			diff.d = 0; } }      \
-	SkipOneSpacer(&string);      \
+#define UPDATE_VALUES_F(m)              \
+	if (defaults) {                     \
+		if (count) {                    \
+			diff.d = m - last.d;        \
+			last.d = m;                 \
+		} else {                        \
+			last.d = m;                 \
+			diff.d = 0; } }             \
+	SkipOneSpacer(&string);             \
 	++count
 
 #define DO_LOOP(n)                                 \
 	count < length && *string && Do##n(&string, &b)
 
 // Macros for the regular values.
-#define DO(m,n)                     \
-	{m b;                           \
-	while (DO_LOOP(n)) {            \
-		SAVE_VALUE((cell)b);        \
-		UPDATE_VALUES((cell)b); } } \
+#define DO(m,n)                         \
+	{ m b; GET_CPTR();                  \
+	while (DO_LOOP(n)) {                \
+		SAVE_VALUE((cell)b);            \
+		UPDATE_VALUES((cell)b); } }     \
 	break;
 
 #define DOV(m,n)                        \
-	{m b;                               \
+	{ m b; GET_CPTR();                  \
 	while (count < length && *string) { \
 		Do##n(&string, &b);             \
 		SAVE_VALUE((cell)b);            \
 		UPDATE_VALUES((cell)b); } }     \
 	break;
 
-#define DOF(m,n)                \
-	{m b;                       \
-	while (DO_LOOP(n)) {        \
-		SAVE_VALUE_F(b)         \
-		UPDATE_VALUES_F(b); } } \
+#define DOF(m,n)                        \
+	{ m b; GET_CPTR();                  \
+	while (DO_LOOP(n)) {                \
+		SAVE_VALUE_F(b)                 \
+		UPDATE_VALUES_F(b); } }         \
 	break;
 
 #define OPTIONAL_INVALID \
@@ -123,7 +127,7 @@ union update_u
 };
 
 int
-	DoArrayValues(char * type, char ** input, cell * cptr, int length, bool defaults, bool wholeString)
+	DoArrayValues(char * type, char ** input, struct args_s * args, int length, bool defaults, bool wholeString, bool doSave)
 {
 	int
 		count = 0;
@@ -134,6 +138,8 @@ int
 	diff.d = 0;
 	char *
 		string = *input;
+	cell *
+		cptr = NULL;
 	switch (*type++)
 	{
 		// Copied directly from the main loop, just with different macros.
@@ -147,6 +153,7 @@ int
 				// will just end up with larger values of true.
 				bool
 					b;
+				GET_CPTR();
 				while (count < length && *string)
 				{
 					DoL(&string, &b);
@@ -206,11 +213,12 @@ int
 			{
 				double
 					b;
+				GET_CPTR();
 				while (DO_LOOP(G))
 				{
 					float
 						f = (float)b;
-					if (cptr)
+					if (doSave)
 					{
 						*cptr++ = amx_ftoc(f);
 					}
@@ -250,6 +258,7 @@ int
 			}
 			if (defaults)
 			{
+				GET_CPTR();
 				if (gOptions & 1)
 				{
 					int
@@ -296,6 +305,7 @@ int
 			}
 			if (defaults)
 			{
+				GET_CPTR();
 				if (gOptions & 1)
 				{
 					int
@@ -342,6 +352,7 @@ int
 			}
 			if (defaults)
 			{
+				GET_CPTR();
 				if (gOptions & 1)
 				{
 					int
@@ -395,7 +406,8 @@ int
 		case 'k':
 			if (defaults)
 			{
-				if (DoK(g_aCurAMX, &type, &string, cptr, false, true) && cptr)
+				GET_CPTR();
+				if (DoK(g_aCurAMX, &type, &string, cptr, false, true) && doSave)
 				{
 					while (++count < length)
 					{
@@ -408,10 +420,10 @@ int
 			{
 				char *
 					f = type;
-				while (count < length && *string && DoK(
-					g_aCurAMX, &f, &string, cptr, false, wholeString && count == length - 1))
+				GET_CPTR();
+				while (count < length && *string && DoK(g_aCurAMX, &f, &string, cptr, false, wholeString && count == length - 1))
 				{
-					if (cptr) ++cptr;
+					if (doSave) ++cptr;
 					SkipOneSpacer(&string);
 					++count;
 					*(f - 1) = '>';
@@ -430,16 +442,15 @@ int
 			// the array specifier, and can thus support jagged arrays!
 			if (defaults)
 			{
-				//char *
-				//	lt = type + 1;
 				int
-					nl = GetLength(&type, false),
+					nl = GetLength(&type, false, args),
 					sl;
 				char *
 					dest;
 				// Parse the default string.
 				DoS(&string, &dest, 0x7FFFFFFF, true);
-				if (cptr)
+				GET_CPTR();
+				if (doSave)
 				{
 					cell *
 						sptr;
@@ -458,16 +469,15 @@ int
 			else
 			{
 				// Get the length.
-				//char *
-				//	lt = type;
 				int
-					nl = GetLength(&type, false),
+					nl = GetLength(&type, false, args),
 					sl;
 				char *
 					dest;
+				GET_CPTR();
 				while (count < length && *string)
 				{
-					if (cptr)
+					if (doSave)
 					{
 						cell *
 							sptr;
@@ -573,7 +583,7 @@ int
 }
 
 bool
-	DoA(char ** defaults, char ** input, cell * cptr, bool optional)
+	DoA(char ** defaults, char ** input, struct args_s * args, bool optional, bool doSave)
 {
 	// First, get the type of the array.
 	bool
@@ -669,7 +679,11 @@ DoA_after_loop:
 	}
 	// GetLength has "true" as arrays, being new, MUST have lengths.
 	int
-		length = GetLength(defaults, true);
+		length = GetLength(defaults, true, args);
+	// We MAY need to go over the arguments twice.  Once to insert defaults, once for real values.
+	// If we mark here and restore at the start of normal data it doesn't matter if we got defaults
+	// or not - if so this is correct, if not the mark/restore won't change anything.
+	args->Mark();
 	if (length)
 	{
 		// Got the length of the array, it's all good.
@@ -679,7 +693,7 @@ DoA_after_loop:
 			// whatever the coder may choose.
 			if (*type == 's' || *type == 'k') TempDelimiter(")");
 			else TempDelimiter(",)");
-			if (DoArrayValues(type, &opts, cptr, length, true, false) == SSCANF_FAIL_RETURN)
+			if (DoArrayValues(type, &opts, args, length, true, false, doSave) == SSCANF_FAIL_RETURN)
 			{
 				RestoreDelimiter();
 				return false;
@@ -688,8 +702,8 @@ DoA_after_loop:
 		}
 		if (input)
 		{
-			switch (DoArrayValues(type, input, cptr, length, false, 
-				(*type == 's' || *type == 'k') && (IsEnd(**defaults) || (!cptr && **defaults == '}' && IsEnd(*(*defaults + 1))))))
+			args->Restore();
+			switch (DoArrayValues(type, input, args, length, false, (*type == 's' || *type == 'k') && (IsEnd(**defaults) || (!doSave && **defaults == '}' && IsEnd(*(*defaults + 1)))), doSave))
 			{
 				case SSCANF_CONT_RETURN:
 					if (optional)

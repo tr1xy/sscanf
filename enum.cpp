@@ -36,35 +36,39 @@
 extern logprintf_t
 	logprintf;
 
-#define SAVE_VALUE(m)            \
-	if (doSave)                  \
+#define GET_CPTR()                      \
+	if (doSave)                         \
+		cptr = args->Next()
+
+#define SAVE_VALUE(m)                   \
+	if (doSave)                         \
 		*cptr++ = m
 
-#define SAVE_VALUE_F(m)          \
-	if (doSave) {                \
-		float f = (float)m;      \
+#define SAVE_VALUE_F(m)                 \
+	if (doSave) {                       \
+		float f = (float)m;             \
 		*cptr++ = amx_ftoc(f); }
 
 // Macros for the regular values.
-#define DO(m,n)                  \
-	{m b;                        \
-	if (Do##n(&string, &b)) {    \
-		SAVE_VALUE((cell)b);     \
-		break; }                 \
-	*input = string;             \
+#define DO(m,n)                         \
+	{ m b; GET_CPTR();                  \
+	if (Do##n(&string, &b)) {           \
+		SAVE_VALUE((cell)b);            \
+		break; }                        \
+	*input = string;                    \
 	return SSCANF_FAIL_RETURN; }
 
-#define DOV(m,n)                 \
-	{m b;                        \
-	Do##n(&string, &b);          \
+#define DOV(m,n)                        \
+	{ m b; GET_CPTR();                  \
+	Do##n(&string, &b);                 \
 	SAVE_VALUE((cell)b); }
 
-#define DOF(m,n)                 \
-	{m b;                        \
-	if (Do##n(&string, &b)) {    \
-		SAVE_VALUE_F(b)          \
-		break; }                 \
-	*input = string;             \
+#define DOF(m,n)                        \
+	{ m b; GET_CPTR();                  \
+	if (Do##n(&string, &b)) {           \
+		SAVE_VALUE_F(b)                 \
+		break; }                        \
+	*input = string;                    \
 	return SSCANF_FAIL_RETURN; }
 
 #define OPTIONAL_INVALID \
@@ -83,17 +87,15 @@ extern int
 	gOptions;
 
 bool
-	DoK(AMX * amx, char ** defaults, char ** input, cell * cptr, bool optional, bool all);
+	DoK(AMX * amx, char ** defaults, char ** input, struct args_s * args, bool optional, bool all);
 
 int
-	DoEnumValues(char * format, char ** input, cell * cptr, bool defaults)
+	DoEnumValues(char * format, char ** input, struct args_s * args, bool defaults, bool doSave)
 {
-	// If cptr is NULL we never save - regardless of quiet sections.
-	bool
-		doSave = cptr != NULL;
 	char *
 		string = *input;
 	// Copied directly from the main loop, just with different macros.
+	//GET_CPTR();
 	while (*string)
 	{
 		if (!*format)
@@ -270,14 +272,14 @@ int
 					{
 						// Get the length.
 						int
-							lole = GetLength(&format, true);
+							lole = GetLength(&format, true, args);
 						if (!lole)
 						{
 							return SSCANF_FAIL_RETURN;
 						}
 						char *
 							dest;
-						DoS(&string, &dest, lole, IsEnd(*format));
+						DoS(&string, &dest, lole, IsEnd(*format), args);
 						// Send the string to PAWN.
 						if (doSave)
 						{
@@ -502,13 +504,13 @@ int
 							case 'r':
 								if (*format == '[')
 								{
-									len = GetLength(&format, true);
+									len = GetLength(&format, true, args);
 								}
 								break;
 							case 'A':
 								OPTIONAL_INVALID;
 							case 'a':
-								len = GetLength(&format, true);
+								len = GetLength(&format, true, args);
 								break;
 							case 'E':
 								OPTIONAL_INVALID;
@@ -526,7 +528,7 @@ int
 								OPTIONAL_INVALID;
 								// FALLTHROUGH
 							case 's':
-								len = GetLength(&format, true);
+								len = GetLength(&format, true, args);
 								break;
 							case '?':
 								logprintf("sscanf warning: A minus option makes no sense.");
@@ -584,7 +586,7 @@ int
 }
 
 bool
-	DoE(char ** defaults, char ** input, cell * cptr, bool optional)
+	DoE(char ** defaults, char ** input, cell * cptr, bool optional, bool doSave)
 {
 	// First, get the type of the array.
 	char *
