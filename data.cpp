@@ -924,7 +924,7 @@ void
 	}
 	else
 	{
-		logprintf("sscanf warning: Arrays without a length are deprecated, please add a destination size.");
+		logprintf("sscanf error: String/array must include a length, please add a destination size.");
 	}
 }
 
