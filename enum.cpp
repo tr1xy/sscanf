@@ -83,7 +83,7 @@ extern int
 	gOptions;
 
 bool
-	DoK(AMX * amx, char ** defaults, char ** input, struct args_s * args, bool optional, bool all);
+	DoK(AMX * amx, char ** defaults, char ** input, cell * cptr, bool optional, bool all);
 
 int
 	DoEnumValues(char * format, char ** input, cell * cptr, bool defaults, struct args_s * args)
@@ -240,7 +240,7 @@ int
 					}
 					else if (doSave)
 					{
-						if (DoK(g_aCurAMX, &format, &string, args, false, false))
+						if (DoK(g_aCurAMX, &format, &string, cptr, false, false))
 						{
 							*(format - 1) = '>';
 							++cptr;

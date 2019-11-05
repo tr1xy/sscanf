@@ -71,29 +71,6 @@ bool
 			{
 				logprintf("sscanf warning: Unclosed default value.");
 			}
-			/*if (optional)
-			{
-				// Optional parameters are always separated by commans, not
-				// whatever the coder may choose.
-				TempDelimiter(",)");
-				// We need to copy the old save value for optional parts.  If
-				// we don't and save gets set to false in the middle of the
-				// enum then when the code is called for a second time for the
-				// real values then save will already be false and they won't
-				// get saved.
-				switch (DoEnumValues(type, &opts, cptr, true))
-				{
-					case SSCANF_TRUE_RETURN:
-						break;
-					case SSCANF_CONT_RETURN:
-						logprintf("sscanf error: Insufficient default values.");
-						// FALLTHROUGH
-					default:
-						RestoreDelimiter();
-						return false;
-				}
-				RestoreDelimiter();
-			}*/
 		}
 		else
 		{

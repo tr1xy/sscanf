@@ -167,7 +167,7 @@ AMX *
 	SkipDefault(&format);
 
 bool
-	DoK(AMX * amx, char ** defaults, char ** input, struct args_s * args, bool optional, bool all);
+	DoK(AMX * amx, char ** defaults, char ** input, cell * cptr, bool optional, bool all);
 
 void
 	DoOptions(char *, cell);
@@ -205,18 +205,18 @@ static cell AMX_NATIVE_CALL
 	// by one (OBOE - Out By One Error) due to params[0] being the parameter
 	// count, not an actual parameter.
 	const int
-		count = ((int)params[0] / 4) + 1;
+		paramCount = ((int)params[0] / 4) + 1;
 	// Could add a check for only 3 parameters here - I can't think of a time
 	// when you would not want any return values at all, but that doesn't mean
 	// they don't exist - you could just want to check but not save the format.
 	// Update - that is now a possibility with the '{...}' specifiers.
-	if (count < (2 + 1))
+	if (paramCount < (2 + 1))
 	{
 		logprintf("sscanf error: Missing required parameters.");
 		return SSCANF_FAIL_RETURN;
 	}
 	struct args_s
-		args{ amx, params, count };
+		args{ amx, params, 3, 3 };
 	//else if (paramCount == (2 + 1))
 	//{
 		// Only have an input and a specifier - better hope the whole specifier
@@ -240,9 +240,6 @@ static cell AMX_NATIVE_CALL
 	// Save the default options so we can have local modifications.
 	int
 		defaultOpts = gOptions;
-	// Current parameter to save data to.
-	int
-		paramPos = 3;
 	InitialiseDelimiter();
 	// Skip leading space.
 	SkipWhitespace(&string);
@@ -261,7 +258,7 @@ static cell AMX_NATIVE_CALL
 	g_aCurAMX = amx;
 	// Now do the main loop as long as there are variables to store the data in
 	// and input string remaining to get the data from.
-	while (*string && (paramPos < paramCount || !doSave))
+	while (*string && (args.Pos < paramCount || !doSave))
 	{
 		if (!*format)
 		{
@@ -272,7 +269,7 @@ static cell AMX_NATIVE_CALL
 			// There is only two format specifiers, but four returns.  This may
 			// also be reached if there is too much input data, but that is
 			// considered OK as that is likely a user's fault.
-			if (paramPos < paramCount)
+			if (args.Pos < paramCount)
 			{
 				logprintf("sscanf warning: Format specifier does not match parameter count.");
 			}
@@ -775,7 +772,7 @@ static cell AMX_NATIVE_CALL
 					// We need the default values here.
 					if (doSave)
 					{
-						if (DoK(amx, &format, &string, &args, true, consume_all))
+						if (DoK(amx, &format, &string, args.Next(), true, consume_all))
 						{
 							break;
 						}
@@ -798,7 +795,7 @@ static cell AMX_NATIVE_CALL
 						|| (!doSave && *after_spec == '}' && IsEnd(*(after_spec + 1)));
 					if (doSave)
 					{
-						if (DoK(amx, &format, &string, &args, false, consume_all))
+						if (DoK(amx, &format, &string, args.Next(), false, consume_all))
 						{
 							break;
 						}
@@ -927,10 +924,10 @@ static cell AMX_NATIVE_CALL
 	// Temporary to the end of the code.
 	ResetDelimiter();
 	AddDelimiter(')');
-	// We don't need code here to handle the case where paramPos was reached,
+	// We don't need code here to handle the case where args.Pos was reached,
 	// but the end of the string wasn't - if that's the case there's no
 	// problem as we just ignore excess string data.
-	while (paramPos < paramCount || !doSave)
+	while (args.Pos < paramCount || !doSave)
 	{
 		// Loop through if there's still parameters remaining.
 		if (!*format)
@@ -994,9 +991,22 @@ static cell AMX_NATIVE_CALL
 					RestoreOpts(defaultOpts);
 					return SSCANF_FAIL_RETURN;
 				case 'K':
-					if (DoK(amx, &format, NULL, &args, true, doSave, false))
+					if (doSave)
 					{
-						break;
+						if (DoK(amx, &format, NULL, args.Next(), true, false))
+						{
+							break;
+						}
+					}
+					else
+					{
+						// Pass a NULL pointer so data isn't saved anywhere.
+						// Also pass NULL data so it knows to only collect the
+						// default values.
+						if (DoK(amx, &format, NULL, NULL, true, false))
+						{
+							break;
+						}
 					}
 					RestoreOpts(defaultOpts);
 					return SSCANF_FAIL_RETURN;
