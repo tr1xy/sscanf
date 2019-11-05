@@ -24,14 +24,13 @@
  *  SA:MP Team past, present and future
  */
 
-#include "SDK/amx/amx.h"
-
 #include <string.h>
 
+#include "sscanf.h"
+#include "args.h"
 #include "utils.h"
 #include "specifiers.h"
 #include "data.h"
-#include "sscanf.h"
 
 extern logprintf_t
 	logprintf;

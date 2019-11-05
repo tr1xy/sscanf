@@ -110,6 +110,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="args.h" />
     <ClInclude Include="SDK\amx\amx.h" />
     <ClInclude Include="SDK\amx\getch.h" />
     <ClInclude Include="SDK\plugin.h" />

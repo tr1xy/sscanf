@@ -26,9 +26,8 @@
 
 #include <stdio.h>
 
-#include "SDK/amx/amx.h"
-
 #include "sscanf.h"
+#include "args.h"
 #include "utils.h"
 #include "data.h"
 #include "specifiers.h"

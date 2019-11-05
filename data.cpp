@@ -24,9 +24,8 @@
  *  SA:MP Team past, present and future
  */
 
-#include "SDK/amx/amx.h"
-
 #include "sscanf.h"
+#include "args.h"
 #include "utils.h"
 
 extern unsigned int

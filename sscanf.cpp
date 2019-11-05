@@ -30,13 +30,13 @@
 #include <string.h>
 
 #include "sscanf.h"
+#include "args.h"
 #include "specifiers.h"
 #include "utils.h"
 #include "data.h"
 #include "array.h"
 #include "enum.h"
 
-#include "SDK/amx/amx.h"
 #include "SDK/plugincommon.h"
 
 //----------------------------------------------------------
@@ -94,7 +94,8 @@ AMX *
 // require memory free code all over the place!
 #define STR_PARAM(amx,param,result)                                                          \
 	do {                                                                                     \
-		cell * amx_cstr_ = args.Next(); int amx_length_;                                     \
+		cell * amx_cstr_; int amx_length_;                                                   \
+		amx_GetAddr((amx), (param), &amx_cstr_);                                             \
 		amx_StrLen(amx_cstr_, &amx_length_);                                                 \
 		if (amx_length_ > 0) {                                                               \
 			if (((result) = (char *)alloca((amx_length_ + 1) * sizeof (*(result)))) != NULL) \
@@ -418,7 +419,7 @@ static cell AMX_NATIVE_CALL
 							length = GetLength(&format, false, &args);
 						char *
 							dest;
-						DoS(&string, &dest, length, IsEnd(*format) || (!doSave && *format == '}' && IsEnd(*(format + 1))), &args);
+						DoS(&string, &dest, length, IsEnd(*format) || (!doSave && *format == '}' && IsEnd(*(format + 1))));
 						// Send the string to PAWN.
 						if (doSave)
 						{
@@ -536,7 +537,7 @@ static cell AMX_NATIVE_CALL
 						if (*format == '[')
 						{
 							int
-								len = GetLength(&format, true);
+								len = GetLength(&format, true, &args);
 							if (gOptions & 1)
 							{
 								// Incompatible combination.
@@ -568,7 +569,7 @@ static cell AMX_NATIVE_CALL
 					if (*format == '[')
 					{
 						int
-							len = GetLength(&format, true);
+							len = GetLength(&format, true, &args);
 						if (len < 2)
 						{
 							logprintf("sscanf error: 'q[len]' length under 2.");
@@ -637,7 +638,7 @@ static cell AMX_NATIVE_CALL
 						if (*format == '[')
 						{
 							int
-								len = GetLength(&format, true);
+								len = GetLength(&format, true, &args);
 							if (gOptions & 1)
 							{
 								// Incompatible combination.
@@ -669,7 +670,7 @@ static cell AMX_NATIVE_CALL
 					if (*format == '[')
 					{
 						int
-							len = GetLength(&format, true);
+							len = GetLength(&format, true, &args);
 						if (len < 2)
 						{
 							logprintf("sscanf error: 'r[len]' length under 2.");

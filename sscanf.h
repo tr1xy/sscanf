@@ -97,16 +97,3 @@ typedef
 #define FLOAT_NEGATIVE_INFINITY (FLOAT_NEG_INFINITY)
 
 #define SSCANF_QUIET 0
-
-struct args_s
-{
-	AMX * Amx;
-	cell * Params;
-	int Pos;
-	int Marker;
-
-	cell * Next();
-	void Mark();
-	void Restore();
-};
-
