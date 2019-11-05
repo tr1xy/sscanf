@@ -36,10 +36,6 @@
 extern logprintf_t
 	logprintf;
 
-#define GET_CPTR()                      \
-	if (doSave)                         \
-		cptr = args->Next()
-
 #define SAVE_VALUE(m)                   \
 	if (doSave)                         \
 		*cptr++ = m
@@ -51,7 +47,7 @@ extern logprintf_t
 
 // Macros for the regular values.
 #define DO(m,n)                         \
-	{ m b; GET_CPTR();                  \
+	{ m b;                              \
 	if (Do##n(&string, &b)) {           \
 		SAVE_VALUE((cell)b);            \
 		break; }                        \
@@ -59,12 +55,12 @@ extern logprintf_t
 	return SSCANF_FAIL_RETURN; }
 
 #define DOV(m,n)                        \
-	{ m b; GET_CPTR();                  \
+	{ m b;                              \
 	Do##n(&string, &b);                 \
 	SAVE_VALUE((cell)b); }
 
 #define DOF(m,n)                        \
-	{ m b; GET_CPTR();                  \
+	{ m b;                              \
 	if (Do##n(&string, &b)) {           \
 		SAVE_VALUE_F(b)                 \
 		break; }                        \
@@ -90,12 +86,14 @@ bool
 	DoK(AMX * amx, char ** defaults, char ** input, struct args_s * args, bool optional, bool all);
 
 int
-	DoEnumValues(char * format, char ** input, struct args_s * args, bool defaults, bool doSave)
+	DoEnumValues(char * format, char ** input, cell * cptr, bool defaults, struct args_s * args)
 {
+	// If cptr is NULL we never save - regardless of quiet sections.
+	bool
+		doSave = cptr != NULL;
 	char *
 		string = *input;
 	// Copied directly from the main loop, just with different macros.
-	//GET_CPTR();
 	while (*string)
 	{
 		if (!*format)
@@ -242,7 +240,7 @@ int
 					}
 					else if (doSave)
 					{
-						if (DoK(g_aCurAMX, &format, &string, cptr, false, false))
+						if (DoK(g_aCurAMX, &format, &string, args, false, false))
 						{
 							*(format - 1) = '>';
 							++cptr;
@@ -279,7 +277,7 @@ int
 						}
 						char *
 							dest;
-						DoS(&string, &dest, lole, IsEnd(*format), args);
+						DoS(&string, &dest, lole, IsEnd(*format));
 						// Send the string to PAWN.
 						if (doSave)
 						{
@@ -586,11 +584,14 @@ int
 }
 
 bool
-	DoE(char ** defaults, char ** input, cell * cptr, bool optional, bool doSave)
+	DoE(char ** defaults, char ** input, struct args_s * args, bool optional, bool doSave)
 {
 	// First, get the type of the array.
 	char *
 		type = GetMultiType(defaults);
+	cell *
+		cptr = NULL;
+	args->Mark();
 	if (!type)
 	{
 		return false;
@@ -650,7 +651,16 @@ bool
 				// enum then when the code is called for a second time for the
 				// real values then save will already be false and they won't
 				// get saved.
-				switch (DoEnumValues(type, &opts, cptr, true))
+				if (doSave)
+				{
+					char *
+						tmp = opts;
+					DoEnumValues(type, &tmp, NULL, true, args);
+					cptr = args->Next();
+					args->Restore();
+				}
+				// Do this twice.  Once to get the lengths, once for the data.
+				switch (DoEnumValues(type, &opts, cptr, true, args))
 				{
 					case SSCANF_TRUE_RETURN:
 						break;
@@ -662,6 +672,8 @@ bool
 						return false;
 				}
 				RestoreDelimiter();
+				if (cptr)
+					args->Next();
 			}
 		}
 		else
@@ -672,13 +684,26 @@ bool
 	}
 	if (input)
 	{
-		switch (DoEnumValues(type, input, cptr, false))
+		if (doSave && !cptr)
+		{
+			args->Mark();
+			char *
+				tmp = *input;
+			DoEnumValues(type, &tmp, NULL, false, args);
+			cptr = args->Next();
+		}
+		args->Restore();
+		switch (DoEnumValues(type, input, cptr, false, args))
 		{
 			case SSCANF_TRUE_RETURN:
+				if (cptr)
+					args->Next();
 				return true;
 			case SSCANF_CONT_RETURN:
 				if (optional)
 				{
+					if (cptr)
+						args->Next();
 					return true;
 				}
 				// FALLTHROUGH
