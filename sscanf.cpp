@@ -386,12 +386,6 @@ static cell AMX_NATIVE_CALL
 					ResetDelimiter();
 					AddDelimiter(GetSingleType(&format));
 					continue;
-				case 'Z':
-					logprintf("sscanf warning: 'Z' doesn't exist - that would be an optional, deprecated optional string!.");
-					// FALLTHROUGH
-				case 'z':
-					logprintf("sscanf warning: 'z' is deprecated, consider using 'S' instead.");
-					// FALLTHROUGH
 				case 'S':
 					if (IsDelimiter(*string))
 					{
@@ -1032,12 +1026,6 @@ static cell AMX_NATIVE_CALL
 						doSave = true;
 					}
 					break;
-				case 'Z':
-					logprintf("sscanf warning: 'Z' doesn't exist - that would be an optional, deprecated optional string!.");
-					// FALLTHROUGH
-				case 'z':
-					logprintf("sscanf warning: 'z' is deprecated, consider using 'S' instead.");
-					// FALLTHROUGH
 				case 'S':
 					{
 						char *

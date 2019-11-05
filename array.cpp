@@ -593,14 +593,6 @@ bool
 	if (!type) return false;
 	switch (*type)
 	{
-		case 'Z':
-			// Don't even THINK about using "Z" - you will get THREE error
-			// messages telling you off, "z" will give you 2, and "S" just 1.
-			logprintf("sscanf warning: 'Z' doesn't exist - that would be an optional, deprecated optional string!.");
-			// FALLTHROUGH
-		case 'z':
-			logprintf("sscanf warning: 'z' is deprecated, consider using 'S' instead.");
-			// FALLTHROUGH
 		case 'S':
 			OPTIONAL_INVALID;
 			*type = 's';

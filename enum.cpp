@@ -256,12 +256,6 @@ int
 					}
 					*input = string;
 					return SSCANF_FAIL_RETURN;
-				case 'Z':
-					logprintf("sscanf warning: 'Z' doesn't exist - that would be an optional, deprecated optional string!");
-					// FALLTHROUGH
-				case 'z':
-					logprintf("sscanf warning: 'z' is deprecated, consider using 'S' instead.");
-					// FALLTHROUGH
 				case 'S':
 					OPTIONAL_INVALID;
 					// FALLTHROUGH
@@ -515,12 +509,6 @@ int
 								logprintf("sscanf error: Enums are not supported in enums.");
 								*input = string;
 								return SSCANF_FAIL_RETURN;
-							case 'Z':
-								logprintf("sscanf warning: 'Z' doesn't exist - that would be an optional, deprecated optional string!.");
-								// FALLTHROUGH
-							case 'z':
-								logprintf("sscanf warning: 'z' is deprecated, consider using 'S' instead.");
-								// FALLTHROUGH
 							case 'S':
 								OPTIONAL_INVALID;
 								// FALLTHROUGH
