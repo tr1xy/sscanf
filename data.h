@@ -69,7 +69,7 @@ void
 	SkipLength(char ** const input);
 
 int
-	GetLength(char ** const input, bool error, struct args_s * args);
+	GetLength(char ** const input, bool error, struct args_s & args);
 
 bool
 	FindDefaultStart(char ** const str);

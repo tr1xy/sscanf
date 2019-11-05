@@ -93,7 +93,7 @@ bool
 	DoGD(char ** input, double * ret);
 
 bool
-	DoSD(char ** input, char ** ret, int * length, struct args_s * args);
+	DoSD(char ** input, char ** ret, int * length, struct args_s & args);
 
 bool
 	DoUD(char ** input, int * ret);

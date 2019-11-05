@@ -814,7 +814,7 @@ bool
 }
 
 bool
-	DoSD(char ** input, char ** ret, int * length, struct args_s * args)
+	DoSD(char ** input, char ** ret, int * length, struct args_s & args)
 {
 	if (!FindDefaultStart(input))
 	{

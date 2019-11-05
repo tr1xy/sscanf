@@ -37,7 +37,7 @@ extern logprintf_t
 
 #define GET_CPTR()                      \
 	if (doSave)                         \
-		cptr = args->Next()
+		cptr = args.Next()
 
 #define SAVE_VALUE(m)                   \
 	if (doSave)                         \
@@ -126,7 +126,7 @@ union update_u
 };
 
 int
-	DoArrayValues(char * type, char ** input, struct args_s * args, int length, bool defaults, bool wholeString, bool doSave)
+	DoArrayValues(char * type, char ** input, struct args_s & args, int length, bool defaults, bool wholeString, bool doSave)
 {
 	int
 		count = 0;
@@ -582,7 +582,7 @@ int
 }
 
 bool
-	DoA(char ** defaults, char ** input, struct args_s * args, bool optional, bool doSave)
+	DoA(char ** defaults, char ** input, struct args_s & args, bool optional, bool doSave)
 {
 	// First, get the type of the array.
 	bool
@@ -682,7 +682,7 @@ DoA_after_loop:
 	// We MAY need to go over the arguments twice.  Once to insert defaults, once for real values.
 	// If we mark here and restore at the start of normal data it doesn't matter if we got defaults
 	// or not - if so this is correct, if not the mark/restore won't change anything.
-	args->Mark();
+	args.Mark();
 	if (length)
 	{
 		// Got the length of the array, it's all good.
@@ -701,7 +701,7 @@ DoA_after_loop:
 		}
 		if (input)
 		{
-			args->Restore();
+			args.Restore();
 			switch (DoArrayValues(type, input, args, length, false, (*type == 's' || *type == 'k') && (IsEnd(**defaults) || (!doSave && **defaults == '}' && IsEnd(*(*defaults + 1)))), doSave))
 			{
 				case SSCANF_CONT_RETURN:

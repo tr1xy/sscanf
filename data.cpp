@@ -940,7 +940,7 @@ void
 }
 
 int
-	GetLength(char ** const input, bool error, struct args_s * args)
+	GetLength(char ** const input, bool error, struct args_s & args)
 {
 	if (**input == '[')
 	{
@@ -953,7 +953,7 @@ int
 		{
 			// Length loaded from a parameter.
 			str = *input + 1;
-			length = *args->Next();
+			length = *args.Next();
 		}
 		else
 		{

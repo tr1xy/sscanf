@@ -399,7 +399,7 @@ static cell AMX_NATIVE_CALL
 							dest;
 						int
 							length;
-						if (DoSD(&format, &dest, &length, &args))
+						if (DoSD(&format, &dest, &length, args))
 						{
 							// Send the string to PAWN.
 							if (doSave)
@@ -416,7 +416,7 @@ static cell AMX_NATIVE_CALL
 					{
 						// Get the length.
 						int
-							length = GetLength(&format, false, &args);
+							length = GetLength(&format, false, args);
 						char *
 							dest;
 						DoS(&string, &dest, length, IsEnd(*format) || (!doSave && *format == '}' && IsEnd(*(format + 1))));
@@ -436,7 +436,7 @@ static cell AMX_NATIVE_CALL
 						if (*format == '[')
 						{
 							int
-								len = GetLength(&format, true, &args);
+								len = GetLength(&format, true, args);
 							if (gOptions & 1)
 							{
 								// Incompatible combination.
@@ -468,7 +468,7 @@ static cell AMX_NATIVE_CALL
 					if (*format == '[')
 					{
 						int
-							len = GetLength(&format, true, &args);
+							len = GetLength(&format, true, args);
 						if (len < 2)
 						{
 							logprintf("sscanf error: 'u[len]' length under 2.");
@@ -537,7 +537,7 @@ static cell AMX_NATIVE_CALL
 						if (*format == '[')
 						{
 							int
-								len = GetLength(&format, true, &args);
+								len = GetLength(&format, true, args);
 							if (gOptions & 1)
 							{
 								// Incompatible combination.
@@ -569,7 +569,7 @@ static cell AMX_NATIVE_CALL
 					if (*format == '[')
 					{
 						int
-							len = GetLength(&format, true, &args);
+							len = GetLength(&format, true, args);
 						if (len < 2)
 						{
 							logprintf("sscanf error: 'q[len]' length under 2.");
@@ -638,7 +638,7 @@ static cell AMX_NATIVE_CALL
 						if (*format == '[')
 						{
 							int
-								len = GetLength(&format, true, &args);
+								len = GetLength(&format, true, args);
 							if (gOptions & 1)
 							{
 								// Incompatible combination.
@@ -670,7 +670,7 @@ static cell AMX_NATIVE_CALL
 					if (*format == '[')
 					{
 						int
-							len = GetLength(&format, true, &args);
+							len = GetLength(&format, true, args);
 						if (len < 2)
 						{
 							logprintf("sscanf error: 'r[len]' length under 2.");
@@ -732,14 +732,14 @@ static cell AMX_NATIVE_CALL
 					break;
 				case 'A':
 					// We need the default values here.
-					if (DoA(&format, &string, &args, true, doSave))
+					if (DoA(&format, &string, args, true, doSave))
 					{
 						break;
 					}
 					RestoreOpts(defaultOpts);
 					return SSCANF_FAIL_RETURN;
 				case 'a':
-					if (DoA(&format, &string, &args, false, doSave))
+					if (DoA(&format, &string, args, false, doSave))
 					{
 						break;
 					}
@@ -747,14 +747,14 @@ static cell AMX_NATIVE_CALL
 					return SSCANF_FAIL_RETURN;
 				case 'E':
 					// We need the default values here.
-					if (DoE(&format, &string, &args, true, doSave))
+					if (DoE(&format, &string, args, true, doSave))
 					{
 						break;
 					}
 					RestoreOpts(defaultOpts);
 					return SSCANF_FAIL_RETURN;
 				case 'e':
-					if (DoE(&format, &string, &args, false, doSave))
+					if (DoE(&format, &string, args, false, doSave))
 					{
 						break;
 					}
@@ -978,14 +978,14 @@ static cell AMX_NATIVE_CALL
 				case 'R':
 					DE(int, R)
 				case 'A':
-					if (DoA(&format, NULL, &args, true, doSave))
+					if (DoA(&format, NULL, args, true, doSave))
 					{
 						break;
 					}
 					RestoreOpts(defaultOpts);
 					return SSCANF_FAIL_RETURN;
 				case 'E':
-					if (DoE(&format, NULL, &args, true, doSave))
+					if (DoE(&format, NULL, args, true, doSave))
 					{
 						break;
 					}
@@ -1044,7 +1044,7 @@ static cell AMX_NATIVE_CALL
 							dest;
 						int
 							length;
-						if (DoSD(&format, &dest, &length, &args))
+						if (DoSD(&format, &dest, &length, args))
 						{
 							// Send the string to PAWN.
 							if (doSave)

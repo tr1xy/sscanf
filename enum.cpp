@@ -85,7 +85,7 @@ bool
 	DoK(AMX * amx, char ** defaults, char ** input, cell * cptr, bool optional, bool all);
 
 int
-	DoEnumValues(char * format, char ** input, cell * cptr, bool defaults, struct args_s * args)
+	DoEnumValues(char * format, char ** input, cell * cptr, bool defaults, struct args_s & args)
 {
 	// If cptr is NULL we never save - regardless of quiet sections.
 	bool
@@ -583,14 +583,14 @@ int
 }
 
 bool
-	DoE(char ** defaults, char ** input, struct args_s * args, bool optional, bool doSave)
+	DoE(char ** defaults, char ** input, struct args_s & args, bool optional, bool doSave)
 {
 	// First, get the type of the array.
 	char *
 		type = GetMultiType(defaults);
 	cell *
 		cptr = NULL;
-	args->Mark();
+	args.Mark();
 	if (!type)
 	{
 		return false;
@@ -655,8 +655,8 @@ bool
 					char *
 						tmp = opts;
 					DoEnumValues(type, &tmp, NULL, true, args);
-					cptr = args->Next();
-					args->Restore();
+					cptr = args.Next();
+					args.Restore();
 				}
 				// Do this twice.  Once to get the lengths, once for the data.
 				switch (DoEnumValues(type, &opts, cptr, true, args))
@@ -672,7 +672,7 @@ bool
 				}
 				RestoreDelimiter();
 				if (cptr)
-					args->Next();
+					args.Next();
 			}
 		}
 		else
@@ -685,24 +685,24 @@ bool
 	{
 		if (doSave && !cptr)
 		{
-			args->Mark();
+			args.Mark();
 			char *
 				tmp = *input;
 			DoEnumValues(type, &tmp, NULL, false, args);
-			cptr = args->Next();
+			cptr = args.Next();
 		}
-		args->Restore();
+		args.Restore();
 		switch (DoEnumValues(type, input, cptr, false, args))
 		{
 			case SSCANF_TRUE_RETURN:
 				if (cptr)
-					args->Next();
+					args.Next();
 				return true;
 			case SSCANF_CONT_RETURN:
 				if (optional)
 				{
 					if (cptr)
-						args->Next();
+						args.Next();
 					return true;
 				}
 				// FALLTHROUGH

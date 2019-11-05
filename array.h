@@ -30,4 +30,4 @@
 #include "SDK/plugincommon.h"
 
 bool
-	DoA(char ** defaults, char ** input, struct args_s * cptr, bool optional, bool doSave);
+	DoA(char ** defaults, char ** input, struct args_s & cptr, bool optional, bool doSave);
