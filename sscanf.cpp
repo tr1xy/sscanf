@@ -1230,41 +1230,7 @@ PLUGIN_EXPORT bool PLUGIN_CALL
 	logprintf("         Version:  2.9.0        \n");
 	logprintf("   (c) 2019 Alex \"Y_Less\" Cole  \n");
 	logprintf(" ===============================\n");
-	
-	// Determine server version.  Ideally we would use a feature check, such as
-	// checking wether ConnectNPC exists, doing away with the need for any
-	// memory addresses, unfortunately if the native isn't used in the current
-	// amx, then amx_FindNative won't find it, despite the fact that it does
-	// exist.  I need to find a more reliable and more portable way of checking
-	// the current server version.
-	/*if (logprintf == LOGPRINTF_0221 || logprintf == LOGPRINTF_0222 || logprintf == LOGPRINTF_0223 || logprintf == LOGPRINTF_0224)
-	{
-		g_iServerVersion = SERVER_VERSION_0200;
-		g_iTrueMax = MAX_PLAYERS_0200;
-		g_iInvalid = INVALID_PLAYER_ID_0200;
-	}
-	else if (logprintf == LOGPRINTF_0300)
-	{
-		g_iServerVersion = SERVER_VERSION_0300;
-		g_iTrueMax = MAX_PLAYERS_0300;
-		g_iInvalid = INVALID_PLAYER_ID_0300;
-	}
-	else *//*if (logprintf == LOGPRINTF_0340)
-	{
-		g_iServerVersion = SERVER_VERSION_0340;
-		g_iTrueMax = MAX_PLAYERS_0300;
-		g_iInvalid = INVALID_PLAYER_ID_0300;
-	}
-	else if (logprintf == LOGPRINTF_0342)
-	{
-		g_iServerVersion = SERVER_VERSION_0342;
-		g_iTrueMax = MAX_PLAYERS_0300;
-		g_iInvalid = INVALID_PLAYER_ID_0300;
-	}
-	else
-	{
-		logprintf("sscanf error: The current build ONLY supports 0.3d");
-	}*/ 
+
 	#if SSCANF_QUIET
 		logprintf = qlog;
 	#endif
