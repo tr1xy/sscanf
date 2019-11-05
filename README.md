@@ -1,4 +1,3 @@
-
 # sscanf 2.9.0
 
 ## NPC modes
@@ -1336,6 +1335,11 @@ You edited something in the sscanf2 include - undo it or redownload it.
 ### sscanf 2.8.2 - 18/04/2015
 
 * Fixed a bug where `u` wasn't working correctly after a server restart.
+
+### sscanf 2.8.3 - 02/10/2018
+
+* Allow `k` in arrays.
+* Allow `k` to consume the rest of the line (like strings) when they are the last specifier.
 
 ### sscanf 2.9.0 - 04/11/2019
 
