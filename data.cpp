@@ -949,6 +949,13 @@ int
 			str;
 		int
 			length;
+		bool
+			bracketed = false;
+		if (**input == '(')
+		{
+			++(*input);
+			bracketed = true;
+		}
 		if (**input == '*')
 		{
 			// Length loaded from a parameter.
@@ -972,6 +979,10 @@ int
 					logprintf("sscanf warning: Invalid data length.");
 				}
 			}
+		}
+		if (bracketed && *str == ')')
+		{
+			++str;
 		}
 		if (*str == ']')
 		{
