@@ -45,7 +45,7 @@
     <ClCompile Include="kustom.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="YSF.def">
+    <None Include="sscanf.def">
       <Filter>amx</Filter>
     </None>
   </ItemGroup>
