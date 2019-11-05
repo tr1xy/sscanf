@@ -421,6 +421,41 @@ static cell AMX_NATIVE_CALL
 						}
 					}
 					break;
+				case 'Z':
+					if (IsDelimiter(*string))
+					{
+						char *
+							dest;
+						int
+							length;
+						if (DoSD(&format, &dest, &length, args))
+						{
+							// Send the string to PAWN.
+							if (doSave)
+							{
+								amx_SetString(args.Next(), dest, 1, 0, length);
+							}
+						}
+						break;
+					}
+					// Implicit "else".
+					SkipDefaultEx(&format);
+					// FALLTHROUGH
+				case 'z':
+					{
+						// Get the length.
+						int
+							length = GetLength(&format, false, args);
+						char *
+							dest;
+						DoS(&string, &dest, length, IsEnd(*format) || (!doSave && *format == '}' && IsEnd(*(format + 1))));
+						// Send the string to PAWN.
+						if (doSave)
+						{
+							amx_SetString(args.Next(), dest, 1, 0, length);
+						}
+					}
+					break;
 				case 'U':
 					if (IsDelimiter(*string))
 					{
@@ -1042,6 +1077,22 @@ static cell AMX_NATIVE_CALL
 						}
 					}
 					break;
+				case 'Z':
+					{
+						char *
+							dest;
+						int
+							length;
+						if (DoSD(&format, &dest, &length, args))
+						{
+							// Send the string to PAWN.
+							if (doSave)
+							{
+								amx_SetString(args.Next(), dest, 1, 0, length);
+							}
+						}
+					}
+					break;
 				case 'P':
 					//logprintf("sscanf warning: You can't have an optional delimiter.");
 					GetMultiType(&format);
@@ -1097,6 +1148,7 @@ static cell AMX_NATIVE_CALL
 				case 'q':
 				case 'r':
 				case 's':
+				case 'z':
 				case 'u':
 				case 'x':
 					// These are non optional items, but the input string

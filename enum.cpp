@@ -282,6 +282,32 @@ int
 						}
 					}
 					break;
+				case 'Z':
+					OPTIONAL_INVALID;
+					// FALLTHROUGH
+				case 'z':
+					{
+						// Get the length.
+						int
+							lole = GetLength(&format, true, args);
+						if (!lole)
+						{
+							return SSCANF_FAIL_RETURN;
+						}
+						char *
+							dest;
+						DoS(&string, &dest, lole, IsEnd(*format));
+						// Send the string to PAWN.
+						if (doSave)
+						{
+							// Save the string.
+							amx_SetString(cptr, dest, 1, 0, lole);
+							// Increase the pointer by the MAXIMUM length of
+							// the string - that's how enum strings work.
+							cptr += lole;
+						}
+					}
+					break;
 				case 'U':
 					DX(int, U)
 					// FALLTHROUGH
@@ -509,6 +535,12 @@ int
 								logprintf("sscanf error: Enums are not supported in enums.");
 								*input = string;
 								return SSCANF_FAIL_RETURN;
+							case 'Z':
+								OPTIONAL_INVALID;
+								// FALLTHROUGH
+							case 'z':
+								len = GetLength(&format, true, args);
+								break;
 							case 'S':
 								OPTIONAL_INVALID;
 								// FALLTHROUGH

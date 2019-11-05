@@ -498,6 +498,74 @@ int
 				break;
 			}
 			//return SSCANF_FAIL_RETURN;
+		case 'z':
+			//logprintf("sscanf error: Strings are not supported in arrays.");
+			// Now they are (or rather, now I would like them to be, I've not
+			// actually WRITTEN the code yet...).
+			// This code has to read the memory pointed to by "cptr", which for
+			// a multi-dimensional array points to the array header and from
+			// which we can actually read the array lengths.  Note that this
+			// actually means that we don't need to include the string length in
+			// the array specifier, and can thus support jagged arrays!
+			if (defaults)
+			{
+				int
+					nl = GetLength(&type, false, args),
+					sl;
+				char *
+					dest;
+				// Parse the default string.
+				DoS(&string, &dest, 0x7FFFFFFF, true);
+				GET_CPTR();
+				if (doSave)
+				{
+					cell *
+						sptr;
+					// Send the string to PAWN.
+					while (count < length)
+					{
+						// Get the true address as offset from the array
+						// base address, and its length.
+						GetJaggedSlot(cptr, length, nl, count, &sptr, &sl);
+						amx_SetString(sptr, dest, 1, 0, sl);
+						++count;
+					}
+				}
+				break;
+			}
+			else
+			{
+				// Get the length.
+				int
+					nl = GetLength(&type, false, args),
+					sl;
+				char *
+					dest;
+				GET_CPTR();
+				while (count < length && *string)
+				{
+					if (doSave)
+					{
+						cell *
+							sptr;
+						// Get the true address as offset from the array
+						// base address, and its length.
+						GetJaggedSlot(cptr, length, nl, count, &sptr, &sl);
+						//printf("%d %d\n", nl, sl);
+						//printf("%d %d %d", cptr, sptr, sl);
+						DoS(&string, &dest, sl, wholeString && count == length - 1);
+						amx_SetString(sptr, dest, 1, 0, sl);
+					}
+					else
+					{
+						DoS(&string, &dest, 0x7FFFFFFF, wholeString && count == length - 1);
+					}
+					SkipOneSpacer(&string);
+					++count;
+				}
+				break;
+			}
+			//return SSCANF_FAIL_RETURN;
 		case '{':
 		case '}':
 			logprintf("sscanf error: Quiet sections are not supported in arrays.");
@@ -537,6 +605,7 @@ int
 					case 'K':
 					case 'k':
 					case 's':
+					case 'z':
 						// There is no "progression" in optional strings - you
 						// specify one and JUST one!
 						break;
@@ -597,6 +666,10 @@ bool
 			OPTIONAL_INVALID;
 			*type = 's';
 			break;
+		case 'Z':
+			OPTIONAL_INVALID;
+			*type = 'z';
+			break;
 		case 'K':
 			OPTIONAL_INVALID;
 			*type = 'k';
@@ -644,7 +717,7 @@ bool
 DoA_after_loop:
 			if (**defaults)
 			{
-				if (opts == *defaults && *type != 's'&& *type != 'k')
+				if (opts == *defaults && !(*type == 's' || *type == 'z' || *type == 'k'))
 				{
 					// No defaults found.
 					logprintf("sscanf warning: Empty default values.");
@@ -682,7 +755,7 @@ DoA_after_loop:
 		{
 			// Optional parameters are always separated by commans, not
 			// whatever the coder may choose.
-			if (*type == 's' || *type == 'k') TempDelimiter(")");
+			if ((*type == 's' || *type == 'z' || *type == 'k')) TempDelimiter(")");
 			else TempDelimiter(",)");
 			if (DoArrayValues(type, &opts, args, length, true, false, doSave) == SSCANF_FAIL_RETURN)
 			{
@@ -694,7 +767,7 @@ DoA_after_loop:
 		if (input)
 		{
 			args.Restore();
-			switch (DoArrayValues(type, input, args, length, false, (*type == 's' || *type == 'k') && (IsEnd(**defaults) || (!doSave && **defaults == '}' && IsEnd(*(*defaults + 1)))), doSave))
+			switch (DoArrayValues(type, input, args, length, false, (*type == 's' || *type == 'z' || *type == 'k') && (IsEnd(**defaults) || (!doSave && **defaults == '}' && IsEnd(*(*defaults + 1)))), doSave))
 			{
 				case SSCANF_CONT_RETURN:
 					if (optional)
