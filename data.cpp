@@ -235,24 +235,13 @@ char
 				*format += 3;
 				return ret;
 			}
-			else
-			{
-				logprintf("sscanf warning: Unclosed specifier parameter, assuming '<', consider using something like p<<>.");
-			}
 		}
-		else
-		{
-			logprintf("sscanf warning: Unenclosed specifier parameters are deprecated, consider using something like p<<>.");
-		}
-		++(*format);
-		return '<';
 	}
-	else if (tmp)
+	if (tmp)
 	{
-		// Legacy support.
-		logprintf("sscanf warning: Unenclosed specifier parameters are deprecated, consider using something like p<%c>.", tmp);
+		logprintf("sscanf error: Unenclosed specifier parameter.", tmp);
 		++(*format);
-		return tmp;
+		return ' ';
 	}
 	else
 	{
@@ -940,7 +929,7 @@ void
 }
 
 int
-	GetLength(char ** const input, bool error, struct args_s & args)
+	GetLength(char ** const input, struct args_s & args)
 {
 	if (**input == '[')
 	{
@@ -968,16 +957,8 @@ int
 			str = *input;
 			if (length <= 0)
 			{
-				if (error)
-				{
-					length = 0;
-					logprintf("sscanf error: Invalid data length.");
-				}
-				else
-				{
-					length = SSCANF_MAX_LENGTH;
-					logprintf("sscanf warning: Invalid data length.");
-				}
+				length = 0;
+				logprintf("sscanf error: Invalid data length.");
 			}
 		}
 		if (bracketed && *str == ')')
@@ -1010,15 +991,10 @@ int
 		*input = str;
 		return length;
 	}
-	else if (error)
+	else
 	{
 		logprintf("sscanf error: String/array must include a length, please add a destination size.");
 		return 0;
-	}
-	else
-	{
-		logprintf("sscanf warning: Strings without a length are deprecated, please add a destination size.");
-		return SSCANF_MAX_LENGTH;
 	}
 }
 

@@ -442,7 +442,7 @@ int
 			if (defaults)
 			{
 				int
-					nl = GetLength(&type, false, args),
+					nl = GetLength(&type, args),
 					sl;
 				char *
 					dest;
@@ -469,7 +469,7 @@ int
 			{
 				// Get the length.
 				int
-					nl = GetLength(&type, false, args),
+					nl = GetLength(&type, args),
 					sl;
 				char *
 					dest;
@@ -510,7 +510,7 @@ int
 			if (defaults)
 			{
 				int
-					nl = GetLength(&type, false, args),
+					nl = GetLength(&type, args),
 					sl;
 				char *
 					dest;
@@ -537,7 +537,7 @@ int
 			{
 				// Get the length.
 				int
-					nl = GetLength(&type, false, args),
+					nl = GetLength(&type, args),
 					sl;
 				char *
 					dest;
@@ -741,9 +741,8 @@ DoA_after_loop:
 			optional = false;
 		}
 	}
-	// GetLength has "true" as arrays, being new, MUST have lengths.
 	int
-		length = GetLength(defaults, true, args);
+		length = GetLength(defaults, args);
 	// We MAY need to go over the arguments twice.  Once to insert defaults, once for real values.
 	// If we mark here and restore at the start of normal data it doesn't matter if we got defaults
 	// or not - if so this is correct, if not the mark/restore won't change anything.

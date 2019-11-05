@@ -263,7 +263,7 @@ int
 					{
 						// Get the length.
 						int
-							lole = GetLength(&format, true, args);
+							lole = GetLength(&format, args);
 						if (!lole)
 						{
 							return SSCANF_FAIL_RETURN;
@@ -289,7 +289,7 @@ int
 					{
 						// Get the length.
 						int
-							lole = GetLength(&format, true, args);
+							lole = GetLength(&format, args);
 						if (!lole)
 						{
 							return SSCANF_FAIL_RETURN;
@@ -521,13 +521,13 @@ int
 							case 'r':
 								if (*format == '[')
 								{
-									len = GetLength(&format, true, args);
+									len = GetLength(&format, args);
 								}
 								break;
 							case 'A':
 								OPTIONAL_INVALID;
 							case 'a':
-								len = GetLength(&format, true, args);
+								len = GetLength(&format, args);
 								break;
 							case 'E':
 								OPTIONAL_INVALID;
@@ -539,13 +539,13 @@ int
 								OPTIONAL_INVALID;
 								// FALLTHROUGH
 							case 'z':
-								len = GetLength(&format, true, args);
+								len = GetLength(&format, args);
 								break;
 							case 'S':
 								OPTIONAL_INVALID;
 								// FALLTHROUGH
 							case 's':
-								len = GetLength(&format, true, args);
+								len = GetLength(&format, args);
 								break;
 							case '?':
 								logprintf("sscanf warning: A minus option makes no sense.");

@@ -860,15 +860,15 @@ bool
 		// Skip the final character.
 		*input = string + 1;
 		// NOW get the length.
-		*length = GetLength(input, false, args);
+		*length = GetLength(input, args);
 	}
 	else
 	{
 		logprintf("sscanf warning: Unclosed default value.");
 		// Save the return.
 		*input = string;
-		logprintf("sscanf warning: Strings without a length are deprecated, please add a destination size.");
-		*length = SSCANF_MAX_LENGTH;
+		logprintf("sscanf error: String/array must include a length, please add a destination size.");
+		*length = 1;
 	}
 	// Add a null terminator.
 	if (i >= *length)

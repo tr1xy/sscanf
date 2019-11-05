@@ -410,7 +410,7 @@ static cell AMX_NATIVE_CALL
 					{
 						// Get the length.
 						int
-							length = GetLength(&format, false, args);
+							length = GetLength(&format, args);
 						char *
 							dest;
 						DoS(&string, &dest, length, IsEnd(*format) || (!doSave && *format == '}' && IsEnd(*(format + 1))));
@@ -445,7 +445,7 @@ static cell AMX_NATIVE_CALL
 					{
 						// Get the length.
 						int
-							length = GetLength(&format, false, args);
+							length = GetLength(&format, args);
 						char *
 							dest;
 						DoS(&string, &dest, length, IsEnd(*format) || (!doSave && *format == '}' && IsEnd(*(format + 1))));
@@ -465,7 +465,7 @@ static cell AMX_NATIVE_CALL
 						if (*format == '[')
 						{
 							int
-								len = GetLength(&format, true, args);
+								len = GetLength(&format, args);
 							if (gOptions & 1)
 							{
 								// Incompatible combination.
@@ -497,7 +497,7 @@ static cell AMX_NATIVE_CALL
 					if (*format == '[')
 					{
 						int
-							len = GetLength(&format, true, args);
+							len = GetLength(&format, args);
 						if (len < 2)
 						{
 							logprintf("sscanf error: 'u[len]' length under 2.");
@@ -566,7 +566,7 @@ static cell AMX_NATIVE_CALL
 						if (*format == '[')
 						{
 							int
-								len = GetLength(&format, true, args);
+								len = GetLength(&format, args);
 							if (gOptions & 1)
 							{
 								// Incompatible combination.
@@ -598,7 +598,7 @@ static cell AMX_NATIVE_CALL
 					if (*format == '[')
 					{
 						int
-							len = GetLength(&format, true, args);
+							len = GetLength(&format, args);
 						if (len < 2)
 						{
 							logprintf("sscanf error: 'q[len]' length under 2.");
@@ -667,7 +667,7 @@ static cell AMX_NATIVE_CALL
 						if (*format == '[')
 						{
 							int
-								len = GetLength(&format, true, args);
+								len = GetLength(&format, args);
 							if (gOptions & 1)
 							{
 								// Incompatible combination.
@@ -699,7 +699,7 @@ static cell AMX_NATIVE_CALL
 					if (*format == '[')
 					{
 						int
-							len = GetLength(&format, true, args);
+							len = GetLength(&format, args);
 						if (len < 2)
 						{
 							logprintf("sscanf error: 'r[len]' length under 2.");
