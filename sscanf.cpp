@@ -1227,8 +1227,8 @@ PLUGIN_EXPORT bool PLUGIN_CALL
 	logprintf("\n");
 	logprintf(" ===============================\n");
 	logprintf("      sscanf plugin loaded.     \n");
-	logprintf("         Version:  2.8.3        \n");
-	logprintf("  (c) 2018 Alex \"Y_Less\" Cole  \n");
+	logprintf("         Version:  2.9.0        \n");
+	logprintf("   (c) 2019 Alex \"Y_Less\" Cole  \n");
 	logprintf(" ===============================\n");
 	
 	// Determine server version.  Ideally we would use a feature check, such as
