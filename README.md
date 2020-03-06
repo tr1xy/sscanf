@@ -748,55 +748,55 @@ The options are:
 
 ### OLD_DEFAULT_NAME:
 
-    The behaviour of `U`, `Q`, and `R` have been changed to take any number as a default, instead of a connected player. Setting `OLD_DEFAULT_NAME` to `1` will revert to the old version.
+The behaviour of `U`, `Q`, and `R` have been changed to take any number as a default, instead of a connected player. Setting `OLD_DEFAULT_NAME` to `1` will revert to the old version.
 
 ### MATCH_NAME_PARTIAL:
 
-    Currently sscanf will search for players by name, and will ALWAYS search for player whose name STARTS with the specified string. If you have, say `[CLAN]Y_Less` connected and someone types `Y_Less`, sscanf will not find `[CLAN]Y_Less` because there name doesn't start with the specified name. This option, when set to 1, will search ANYWHERE in the player's name for the given string.
+Currently sscanf will search for players by name, and will ALWAYS search for player whose name STARTS with the specified string. If you have, say `[CLAN]Y_Less` connected and someone types `Y_Less`, sscanf will not find `[CLAN]Y_Less` because there name doesn't start with the specified name. This option, when set to 1, will search ANYWHERE in the player's name for the given string.
 
 ### CELLMIN_ON_MATCHES:
 
-    Whatever the value of `MATCH_NAME_PARTIAL`, the first found player will always be returned, so if you do a search for `_` on an RP server, you could get almost anyone. To detect this case, if more than one player will match the specified string then sscanf will return an ID of `cellmin` instead. This can be combined with `U` for a lot more power:
+Whatever the value of `MATCH_NAME_PARTIAL`, the first found player will always be returned, so if you do a search for `_` on an RP server, you could get almost anyone. To detect this case, if more than one player will match the specified string then sscanf will return an ID of `cellmin` instead. This can be combined with `U` for a lot more power:
 
-    ```pawn
-    sscanf(params, "?<CELLMIN_ON_MATCHES=1>U(-1)", id);
-    if (id == -1)
-    {
-        // No player was entered.
-    }
-    else if (id == cellmin)
-    {
-        // Multiple matches found
-    }
-    else if (id == INVALID_PLAYER_ID)
-    {
-        // Entered player is not connected.
-    }
-    else
-    {
-        // Found just one player.
-    }
-    ```
+```pawn
+sscanf(params, "?<CELLMIN_ON_MATCHES=1>U(-1)", id);
+if (id == -1)
+{
+	// No player was entered.
+}
+else if (id == cellmin)
+{
+	// Multiple matches found
+}
+else if (id == INVALID_PLAYER_ID)
+{
+	// Entered player is not connected.
+}
+else
+{
+	// Found just one player.
+}
+```
 
 ### SSCANF_QUIET:
 
-    Don't print any errors to the console. REALLY not recommended unless you KNOW your code is stable and in production.
+Don't print any errors to the console. REALLY not recommended unless you KNOW your code is stable and in production.
 
 ### OLD_DEFAULT_KUSTOM:
 
-    As with `U`, `K` used to require a valid identifier as the default and would parse it using the specified callback, so this would NOT work:
+As with `U`, `K` used to require a valid identifier as the default and would parse it using the specified callback, so this would NOT work:
 
-    ```
-    K<vehicle>(Veyron)
-    ```
+```
+K<vehicle>(Veyron)
+```
 
-    Because that is not a valid vehicle name in GTA. The new version now JUST takes a number and returns that regardless:
+Because that is not a valid vehicle name in GTA. The new version now JUST takes a number and returns that regardless:
 
-    [code
-    K<vehicle>(9999)
-    ```
+```
+K<vehicle>(9999)
+```
 
-    This setting reverts to the old behaviour.
+This setting reverts to the old behaviour.
 
 ## All specifiers
 
@@ -825,7 +825,7 @@ For quick reference, here is a list of ALL the specifiers and their use:
 |  `o`                                     |  Octal value                           |
 |  `F(float)`                              |  Optional floating point number        |
 |  `f`                                     |  Floating point number                 |
-|  `G(float/INFINITY/-INFINITY/NAN/NAN_E)  |  Optional float with IEEE definitions  |
+|  `G(float/INFINITY/-INFINITY/NAN/NAN_E)` |  Optional float with IEEE definitions  |
 |  `g`                                     |  Float with IEEE definitions           |
 |  `{`                                     |  Open quiet section                    |
 |  `}`                                     |  Close quiet section                   |
@@ -848,7 +848,6 @@ For quick reference, here is a list of ALL the specifiers and their use:
 |  `'string'`                              |  Search string                         |
 |  `%`                                     |  Deprecated optional specifier prefix  |
 |  `?`                                     |  Local options specifier               |
-```
 
 ## `extract`
 
@@ -966,7 +965,7 @@ Note that for technical reasons you can use `<->` (because it looks like the arr
 
 If you get this error, DO NOT just download the dll from a random website. This is part of the `Microsoft Visual Studio Redistributable Package`. This is required for many programs, but they often come with it. Download it here:
 
-[url]http://www.microsoft.com/download/en...s.aspx?id=5555[/url]
+http://www.microsoft.com/download/en...s.aspx?id=5555
 
 ### sscanf error: System not initialised
 
