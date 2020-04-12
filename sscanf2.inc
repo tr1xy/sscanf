@@ -135,6 +135,25 @@ static stock
 		}
 	#endif
 #else
+	static stock SSCANF_RunInit()
+	{
+		new
+			name[MAX_PLAYER_NAME + 1];
+
+		SSCANF_Init(GetMaxPlayers(), INVALID_PLAYER_ID, MAX_PLAYER_NAME);
+		SSCANF_gInit = true;
+
+		// Check if there are any players that aren't initialized.
+		for (new i = 0; i < MAX_PLAYERS; i ++)
+		{
+			if (IsPlayerConnected(i) && !SSCANF_IsConnected(i))
+			{
+				GetPlayerName(i, name, sizeof(name));
+				SSCANF_Join(i, name, IsPlayerNPC(i));
+			}
+		}
+	}
+
 	/*
 	  OnFilterScriptInit
 
@@ -145,22 +164,10 @@ static stock
 
 	public OnFilterScriptInit()
 	{
-	    new
-     		name[MAX_PLAYER_NAME + 1];
-
-		SSCANF_Init(GetMaxPlayers(), INVALID_PLAYER_ID, MAX_PLAYER_NAME);
-		SSCANF_gInit = true;
-
-		// Check if there are any players that aren't initialized.
-		for (new i = 0; i < MAX_PLAYERS; i ++)
+		if (!SSCANF_gInit)
 		{
-		    if (IsPlayerConnected(i) && !SSCANF_IsConnected(i))
-		    {
-		        GetPlayerName(i, name, sizeof(name));
-		        SSCANF_Join(i, name, IsPlayerNPC(i));
-		    }
+			SSCANF_RunInit();
 		}
-
 		#if defined SSCANF_OnFilterScriptInit
 			SSCANF_OnFilterScriptInit();
 		#endif
@@ -189,21 +196,7 @@ static stock
 	{
 		if (!SSCANF_gInit)
 		{
-		    new
-		        name[MAX_PLAYER_NAME + 1];
-
-			SSCANF_Init(GetMaxPlayers(), INVALID_PLAYER_ID, MAX_PLAYER_NAME);
-			SSCANF_gInit = true;
-
-			// Check if there are any players that aren't initialized.
-			for (new i = 0; i < MAX_PLAYERS; i ++)
-			{
-			    if (IsPlayerConnected(i) && !SSCANF_IsConnected(i))
-			    {
-			        GetPlayerName(i, name, sizeof(name));
-			        SSCANF_Join(i, name, IsPlayerNPC(i));
-			    }
-			}
+			SSCANF_RunInit();
 		}
 		#if defined SSCANF_OnGameModeInit
 			SSCANF_OnGameModeInit();
@@ -219,6 +212,32 @@ static stock
 	#define OnGameModeInit SSCANF_OnGameModeInit
 	#if defined SSCANF_OnGameModeInit
 		forward SSCANF_OnGameModeInit();
+	#endif
+
+	/*
+	  OnCachedInit
+
+	  Called when the script starts if it is YSI cached mode.
+	*/
+
+	forward OnCachedInit();
+	public OnCachedInit()
+	{
+		SSCANF_RunInit();
+		#if defined SSCANF_OnCachedInit
+			SSCANF_OnCachedInit();
+		#endif
+		return 1;
+	}
+
+	#if defined _ALS_OnCachedInit
+		#undef OnCachedInit
+	#else
+		#define _ALS_OnCachedInit
+	#endif
+	#define OnCachedInit SSCANF_OnCachedInit
+	#if defined SSCANF_OnCachedInit
+		forward SSCANF_OnCachedInit();
 	#endif
 
 	/*
