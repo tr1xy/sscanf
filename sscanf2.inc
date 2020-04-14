@@ -301,8 +301,8 @@ static stock
 #define SSCANF_Join
 #define SSCANF_Leave
 
-#define extract%0->%1; EXTRN%1;unformat(_:EXTRV:EXTRX:%0,#,%1,,);
-#define unformat(_:EXTRV:EXTRX:%0,#,%1);%2else if (unformat(_:EXTRV:EXTRX:%0,#,%1))
+#define extract%0->%1; EXTRN%1;unformat(_:EXTRV:EXTRX:%0,""#,%1,,);
+#define unformat(_:EXTRV:EXTRX:%0,""#,%1);%2else if (unformat(_:EXTRV:EXTRX:%0,""#,%1))
 
 #define EXTRV:EXTRX:%0<%3>%4#,%9new%1,%2) EXTRZ:EXTRY:%0%4#P<%3>,|||%1|||%2)
 #define EXTRZ:EXTRY:%0#P<,> EXTRY:%0"P<,>"#
