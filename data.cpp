@@ -680,8 +680,8 @@ unsigned int
 		{
 			// Expand out the 3-digit values to 6-digit values.
 			ret =
-				((ret >> 16 & 0x00F) * 0x011 << 16) |
-				((ret >>  8 & 0x00F) * 0x011 <<  8) |
+				((ret >>  8 & 0x00F) * 0x011 << 16) |
+				((ret >>  4 & 0x00F) * 0x011 <<  8) |
 				((ret >>  0 & 0x00F) * 0x011 <<  0)	;
 			*type = 1;
 		}
