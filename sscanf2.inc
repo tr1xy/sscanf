@@ -45,8 +45,8 @@
 	#error sscanf (possibly the PAWN version) already defined.
 #endif
 
-native sscanf(const data[], const format[], {Float,_}:...);
-native unformat(const data[], const format[], {Float,_}:...) = sscanf;
+native SSCANF__(const file[], const line, const data[], const format[], {Float,_}:...);
+native UNFORMAT__(const data[], const format[], {Float,_}:...) = SSCANF__;
 native SSCANF_Init(players, invalid, len);
 native SSCANF_Join(playerid, const name[], npc);
 native SSCANF_Leave(playerid);
@@ -54,13 +54,31 @@ native SSCANF_IsConnected(playerid);
 
 native SSCANF_Option(const name[], value);
 
+#if !defined __PawnBuild && !defined SSCANF_NO_NICE_FEATURES
+	#error sscanf likes the community compiler.  Use `#define SSCANF_NO_NICE_FEATURES` to ignore this.
+#endif
+
+#if defined __PawnBuild
+	#define sscanf( SSCANF__(__file,__line,
+	#define unformat( SSCANF__(__file,__line,
+#else
+	#define sscanf( SSCANF__(SSCANF_UNK_,-1
+	#define unformat( SSCANF__(SSCANF_FOM_,-1
+#endif
+
 stock const
+	SSCANF_UNK_[] = "sscanf",   // Append "unknown file" in the plugin when line number < 0.
+	SSCANF_FOM_[] = "unformat", // Append "unknown file" in the plugin when line number < 0.
+	SSCANF_EXT_[] = "extract",  // Append "unknown file" in the plugin when line number < 0.
 	SSCANF_QUIET[] = "SSCANF_QUIET",
 	OLD_DEFAULT_NAME[] = "OLD_DEFAULT_NAME",
 	MATCH_NAME_PARTIAL[] = "MATCH_NAME_PARTIAL",
 	CELLMIN_ON_MATCHES[] = "CELLMIN_ON_MATCHES",
 	OLD_DEFAULT_KUSTOM[] = "OLD_DEFAULT_KUSTOM",
-	OLD_DEFAULT_CUSTOM[] = "OLD_DEFAULT_CUSTOM";
+	OLD_DEFAULT_CUSTOM[] = "OLD_DEFAULT_CUSTOM",
+	SSCANF_COLOUR_FORMS[] = "SSCANF_COLOUR_FORMS",
+	SSCANF_ALPHA[] = "SSCANF_ALPHA",
+	SSCANF_ARGB[] = "SSCANF_ARGB";
 
 static stock
 	bool:SSCANF_gInit = false,
@@ -301,8 +319,13 @@ static stock
 #define SSCANF_Join
 #define SSCANF_Leave
 
-#define extract%0->%1; EXTRN%1;unformat(_:EXTRV:EXTRX:%0,""#,%1,,);
-#define unformat(_:EXTRV:EXTRX:%0,""#,%1);%2else if (unformat(_:EXTRV:EXTRX:%0,""#,%1))
+#if defined __PawnBuild
+	#define extract%0->%1; EXTRN%1;UNFORMAT__(__file,__line,_:EXTRV:EXTRX:%0,""#,%1,,);
+#else
+	#define extract%0->%1; EXTRN%1;UNFORMAT__(SSCANF_EXT_,-1,_:EXTRV:EXTRX:%0,""#,%1,,);
+#endif
+
+#define UNFORMAT__(%7,%8,_:EXTRV:EXTRX:%0,""#,%1);%2else if (UNFORMAT__(%7,%8,_:EXTRV:EXTRX:%0,""#,%1))
 
 #define EXTRV:EXTRX:%0<%3>%4#,%9new%1,%2) EXTRZ:EXTRY:%0%4#P<%3>,|||%1|||%2)
 #define EXTRZ:EXTRY:%0#P<,> EXTRY:%0"P<,>"#
@@ -342,17 +365,22 @@ static stock
     #define string:
 #endif
 
-#define player:%0;unformat(%1) %0;unformat(%1)
+#define player:%0;UNFORMAT__(%1) %0;UNFORMAT__(%1)
 
-#define hex:%0;unformat(%1) %0;unformat(%1)
+#define hex:%0;UNFORMAT__(%1) %0;UNFORMAT__(%1)
 #define hex_EXTRO:%0#%1,%2|||%3=%9|||%4,%5) EXTRY:%0#%1H"("#%9")"#,%2,%3|||%4|||%5)
 #define hex_EXTRN:%0#%1,%2|||%3|||%4,%5) EXTRY:%0#%1h,%2,%3|||%4|||%5)
 #define hex_EXTRW:%0#%1,%2|||%3[%7]|||%4,%5) EXTRY:%0#%1a<h>[*],%2,(%7),%3|||%4|||%5)
 
-#define bin:%0;unformat(%1) %0;unformat(%1)
+#define bin:%0;UNFORMAT__(%1) %0;UNFORMAT__(%1)
 #define bin_EXTRO:%0#%1,%2|||%3=%9|||%4,%5) EXTRY:%0#%1B"("#%9")"#,%2,%3|||%4|||%5)
 #define bin_EXTRN:%0#%1,%2|||%3|||%4,%5) EXTRY:%0#%1b,%2,%3|||%4|||%5)
 #define bin_EXTRW:%0#%1,%2|||%3[%7]|||%4,%5) EXTRY:%0#%1a<b>[*],%2,(%7),%3|||%4|||%5)
+
+#define colour:%0;UNFORMAT__(%1) %0;UNFORMAT__(%1)
+#define colour_EXTRO:%0#%1,%2|||%3=%9|||%4,%5) EXTRY:%0#%1M"("#%9")"#,%2,%3|||%4|||%5)
+#define colour_EXTRN:%0#%1,%2|||%3|||%4,%5) EXTRY:%0#%1m,%2,%3|||%4|||%5)
+#define colour_EXTRW:%0#%1,%2|||%3[%7]|||%4,%5) EXTRY:%0#%1a<m>[*],%2,(%7),%3|||%4|||%5)
 
 #define kustom:%0<%1> %0
 #define kustom_EXTRO:%0#%1,%2|||%3<%8>=%9|||%4,%5) EXTRY:%0#%1K<%8>"("#%9")"#,%2,%3|||%4|||%5)
@@ -649,4 +677,5 @@ SSCANF:vehicle(string[])
 // Fix the compiler crash when both the PAWN and Plugin versions of sscanf are
 // found by renaming the old version at declaration.  (fixes.inc compatible
 // naming scheme: "BAD_Function()").
-#define sscanf(%0:...) BAD_sscanf(%0:...)
+#define SSCANF__(%0:...) BAD_sscanf(%0:...)
+
