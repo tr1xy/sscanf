@@ -821,6 +821,8 @@ For quick reference, here is a list of ALL the specifiers and their use:
 |  `d`                                     |  Integer                               |
 |  `H(hex value)`                          |  Optional hex number                   |
 |  `h`                                     |  Hex number                            |
+|  `X(hex value)`                          |  Optional hex number                   |
+|  `x`                                     |  Hex number                            |
 |  `O(octal value)`                        |  Optional octal value                  |
 |  `o`                                     |  Octal value                           |
 |  `F(float)`                              |  Optional floating point number        |
