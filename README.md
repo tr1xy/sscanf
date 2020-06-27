@@ -1423,3 +1423,7 @@ You edited something in the sscanf2 include - undo it or redownload it.
 * Added `m` for colours (ran out of useful letters).
 * Added file and line details for errors.
 
+### sscanf 2.10.1 - 27/06/2020
+
+* Plugin backwards-compatability with older includes.
+

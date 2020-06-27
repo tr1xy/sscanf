@@ -239,7 +239,7 @@ static cell AMX_NATIVE_CALL
 	Sscanf(AMX * amx, cell * params, const int paramCount)
 {
 	struct args_s
-		args{ amx, params, 5, 5 };
+		args{ amx, params, 3, 3 };
 	//else if (paramCount == (2 + 1))
 	//{
 		// Only have an input and a specifier - better hope the whole specifier
@@ -249,11 +249,11 @@ static cell AMX_NATIVE_CALL
 	// Get and check the main data.
 	// Pointer to the current format specifier.
 	// Doesn't use `SscanfError`, because we don't have the format specifier yet.
-	SAFE_STR_PARAM(amx, params[4], gFormat);
+	SAFE_STR_PARAM(amx, params[2], gFormat);
 	// Pointer to the current input data.
 	char *
 		string;
-	STR_PARAM(amx, params[3], string);
+	STR_PARAM(amx, params[1], string);
 	char *
 		format = gFormat;
 	// Check for CallRemoteFunction style null strings and correct.
@@ -1264,6 +1264,74 @@ static cell AMX_NATIVE_CALL
 	return SSCANF_TRUE_RETURN;
 }
 
+static cell AMX_NATIVE_CALL
+	n_old_sscanf(AMX * amx, cell * params)
+{
+	if (g_iTrueMax == 0)
+	{
+		logprintf("sscanf error: System not initialised.");
+		return SSCANF_FAIL_RETURN;
+	}
+	// Friendly note, the most complex set of specifier additions is:
+	// 
+	//  A<i>(10, 11)[5]
+	// 
+	// In that exact order - type, default, size.  It's very opposite to how
+	// it's done in code, where you would do the eqivalent to:
+	// 
+	//  <i>[5] = {10, 11}
+	// 
+	// But this method is vastly simpler to parse in this context!  Technically
+	// you can, due to legacy support for 'p', do:
+	// 
+	//  Ai(10, 11)[5]
+	// 
+	// But you will get an sscanf warning, and I may remove that ability from
+	// the start - that will mean a new function, but an easy to write one.
+	// In fact the most complex will probably be something like:
+	// 
+	//  E<ifs[32]s[8]d>(10, 12.3, Hello there, Hi, 42)
+	// 
+	// Get the number of parameters passed.  We add one as the indexes are out
+	// by one (OBOE - Out By One Error) due to params[0] being the parameter
+	// count, not an actual parameter.
+	const int
+		paramCount = ((int)params[0] / 4) + 1;
+	// Could add a check for only 3 parameters here - I can't think of a time
+	// when you would not want any return values at all, but that doesn't mean
+	// they don't exist - you could just want to check but not save the format.
+	// Update - that is now a possibility with the '{...}' specifiers.
+	if (paramCount < (2 + 1))
+	{
+		logprintf("sscanf error: Missing required parameters.");
+		return SSCANF_FAIL_RETURN;
+	}
+	// Bacup up the file/line data for nested calls.
+	char
+		* px = gFormat,
+		* pf = gCallFile;
+	int
+		pl = gCallLine;
+	cell *
+		pp = gCallResolve;
+	gFormat = 0;
+	gCallFile = 0;
+	gCallLine = -1;
+	gCallResolve = 0;
+	logprintf("sscanf warning: include/plugin mismatch, please recompile your script for the latest features.");
+	cell ret = Sscanf(amx, params, paramCount);
+	// Restore and free the error data, if it wasn't constant.
+	if (gCallFile && gCallResolve)
+	{
+		free(gCallFile);
+	}
+	gCallResolve = pp;
+	gCallLine = pl;
+	gCallFile = pf;
+	gFormat = px;
+	return ret;
+}
+
 // native sscanf(const data[], const format[], (Float,_}:...);
 static cell AMX_NATIVE_CALL
 	n_sscanf(AMX * amx, cell * params)
@@ -1319,7 +1387,7 @@ static cell AMX_NATIVE_CALL
 	gCallFile = 0;
 	gCallLine = params[2];
 	amx_GetAddr(amx, params[1], &gCallResolve);
-	cell ret = Sscanf(amx, params, paramCount);
+	cell ret = Sscanf(amx, params + 2, paramCount);
 	// Restore and free the error data, if it wasn't constant.
 	if (gCallFile && gCallResolve)
 	{
@@ -1368,7 +1436,7 @@ PLUGIN_EXPORT bool PLUGIN_CALL
 	logprintf("\n");
 	logprintf(" ===============================\n");
 	logprintf("      sscanf plugin loaded.     \n");
-	logprintf("        Version:  2.10.0        \n");
+	logprintf("        Version:  2.10.1        \n");
 	logprintf("   (c) 2020 Alex \"Y_Less\" Cole  \n");
 	logprintf(" ===============================\n");
 
@@ -1517,6 +1585,7 @@ static cell AMX_NATIVE_CALL
 AMX_NATIVE_INFO
 	sscanfNatives[] =
 		{
+			{"sscanf", n_old_sscanf},
 			{"SSCANF__", n_sscanf},
 			{"SSCANF_Init", n_SSCANF_Init},
 			{"SSCANF_Join", n_SSCANF_Join},
