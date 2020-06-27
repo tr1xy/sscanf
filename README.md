@@ -79,6 +79,7 @@ The basic specifiers (the letters `u`, `i`, `s` etc. in the codes above) here.  
 |  `u`           |  User name/id (bots and players)  |  `Y_Less`, `0`                                            |
 |  `q`           |  Bot name/id                      |  `ShopBot, `27`                                           |
 |  `r`           |  Player name/id                   |  `Y_Less, `42`                                            |
+|  `m`           |  Colour                           |  `{FF00AA}`, `0xFFFFFFFF`, `444`                          |
 
 ### Strings
 
@@ -695,6 +696,42 @@ K<vehicle>(999)
 
 Also as of sscanf 2.8, `k` can be used in both arrays and enums.
 
+### Colours
+
+sscanf 2.10.0 introduced colours in addition to normal hex numbers.  They are parsed almost identically, but have slightly more constraints on their forms.  Colours must be HEX values exactly 3, 6, or 8 digits long.  3 digit numbers are as in CSS - `#RGB` becomes `0xRRGGBBAA` with default alpha, 6 digit numbers are already `0xRRGGBBAA` with default alpha, 8 digit numbers are the full colour with alpha.  The default default alpha is `255` (`FF`), but this can be changed with the `SSCANF_ALPHA` option; for example setting the default alpha to `AA` would be `?<SSCANF_ALPHA=170>`.  Why do they use `m`, not some sane letter?  Simple - all the good descriptive letters were already used.
+
+The different lengths have slightly different semantics in what is accepted, to reduce the changes of incorrect values being parsed.  You can also customise exactly which input types you accept with the `SSCANF_COLOUR_FORMS` option.
+
+#### 3 digits
+
+A 3-digit hex value MUST be prefixed with `#` as in CSS, and each component is multiplied by `0x11` to give the final component value.  `#FAB` would become `0xFFAABBFF`, `#123` would become `0x112233FF`, `000` would be rejected because there is no `#`.
+
+#### 6 digits
+
+A 6-digit hex colour MAY be prefixed by `#` as in CSS, but doesn't have to be; it can also be prefixed by `0x` or nothing at all.  `#123456`, `0x123456`, and `123456` are all the same value, all valid, and will all give an output of `0x123456FF` with the default alpha value.  Furthermore, a 6-digit hex value may be optionally enclosed in `{}`s - `{8800DD}` is valid, but no other length in `{}`s are valid.
+
+More valid examples:
+
+* `FFFFFF`
+* `0x000000`
+* `0x010101`
+* `#EEEEEE`
+* `{000000}`
+
+More invalid examples:
+
+* `FFFFFFF` - 7 digits
+* `0x00000` - 5 digits
+* `#EEEE` - 4 digits
+* `{}` - 0 digits
+* `{BBB}` - 3 digits, but not `#` prefix
+* `{12345678}` - 8 digits, but inside `{}`s`
+* `{123456` - 6 digits, but no closing `}`.
+
+#### 8 digits
+
+8-digit colours are the simplest - the alpha is specified explicitly and there are only two possible input forms - `0x` prefix and no prefix.  I.e. either `0x88995566` or `88995566`.
+
 ## Options
 
 The latest version of sscanf introduces several options that can be used to customise the way in which sscanf operates. There are two ways of setting these options - globally and locally:
@@ -703,19 +740,7 @@ The latest version of sscanf introduces several options that can be used to cust
 SSCANF_Option(SSCANF_QUIET, 1);
 ```
 
-This sets the `SSCANF_QUIET` option globally. Every time `sscanf` is called the option (see below) will be in effect. Note that the use of:
-
-```
-SSCANF_QUIET
-```
-
-Instead of a string as:
-
-```
-SSCANF_QUIET
-```
-
-Is entirely valid here - all the options are defined in the sscanf2 include already.
+This sets the `SSCANF_QUIET` option globally. Every time `sscanf` is called the option (see below) will be in effect. Note that the use of `SSCANF_QUIET` instead of the string `"SSCANF_QUIET"` is entirely valid here - all the options are defined in the sscanf2 include already (but you can use the string if you want).
 
 Alternatively you can use `?` to specify an option locally - i.e. only for the current sscanf call:
 
@@ -798,6 +823,47 @@ K<vehicle>(9999)
 
 This setting reverts to the old behaviour.
 
+### SSCANF_ALPHA:
+
+Specify the default alpha value for colours (`m`) which don't manually specify an alpha channel.  The alpha values are specified as a ***DECIMAL*** number, ***NOT*** a ***HEX*** number, so setting an alpha of `0x80` would be:
+
+```pawn
+SSCANF_Option(SSCANF_ALPHA, 128);
+```
+
+### SSCANF_COLOUR_FORMS:
+
+There are multiple valid colour input formats, which you can enable or disable here.  The parameter is a bitmap for all the following values:
+
+* `1` - `#RGB`
+* `2` - `#RRGGBB`
+* `4` - `0xRRGGBB`
+* `8` - `RRGGBB`
+* `16` - `{RRGGBB}`
+* `32` - `0xRRGGBBAA`
+* `64` - `RRGGBBAA`
+
+So to ONLY accept SA:MP `SendClientMessage` colours use:
+
+```pawn
+SSCANF_Option(SSCANF_COLOUR_FORMS, 16);
+```
+
+To only accept 8-digit values use:
+
+```pawn
+SSCANF_Option(SSCANF_COLOUR_FORMS, 96);
+```
+
+Default values (those specified between `()`s for `M`) ignore this setting - they can always use any form.
+
+### SSCANF_ARGB:
+
+```pawn
+SSCANF_Option(SSCANF_ARGB, 1); // Set 3- and 6-digit colour outputs to `AARRGGBB`.
+SSCANF_Option(SSCANF_ARGB, 0); // Set 3- and 6-digit colour outputs to `RRGGBBAA` (default).
+```
+
 ## All specifiers
 
 For quick reference, here is a list of ALL the specifiers and their use:
@@ -826,6 +892,8 @@ For quick reference, here is a list of ALL the specifiers and their use:
 |  `k<callback>`                           |  Custom operator                       |
 |  `L(true/false)`                         |  Optional logical truthity             |
 |  `l`                                     |  Logical truthity                      |
+|  `M(hex value)`                          |  Optional colour                       |
+|  `m`                                     |  Colour                                |
 |  `N(any format number)`                  |  Optional number                       |
 |  `n`                                     |  Number                                |
 |  `O(octal value)`                        |  Optional octal value                  |
@@ -1349,4 +1417,9 @@ You edited something in the sscanf2 include - undo it or redownload it.
 * Added `z` and `Z` for packed strings (thus officially removing their deprecated optional use).
 * Remove missing string length warnings - its now purely an error.
 * Remove `p,` warnings - its now purely an error.
+
+### sscanf 2.10.0 - 27/06/2020
+
+* Added `m` for colours (ran out of useful letters).
+* Added file and line details for errors.
 
