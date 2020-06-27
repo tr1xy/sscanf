@@ -1368,8 +1368,8 @@ PLUGIN_EXPORT bool PLUGIN_CALL
 	logprintf("\n");
 	logprintf(" ===============================\n");
 	logprintf("      sscanf plugin loaded.     \n");
-	logprintf("         Version:  2.9.0        \n");
-	logprintf("   (c) 2019 Alex \"Y_Less\" Cole  \n");
+	logprintf("        Version:  2.10.0        \n");
+	logprintf("   (c) 2020 Alex \"Y_Less\" Cole  \n");
 	logprintf(" ===============================\n");
 
 	#if SSCANF_QUIET
