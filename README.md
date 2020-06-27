@@ -802,52 +802,51 @@ This setting reverts to the old behaviour.
 
 For quick reference, here is a list of ALL the specifiers and their use:
 
-
 |                  Format                  |                   Use                  |
 | ---------------------------------------- | -------------------------------------- |
-|  `L(true/false)`                         |  Optional logical truthity             |
-|  `l`                                     |  Logical truthity                      |
-|  `K<callback>(any format number)`        |  Optional custom operator              |
-|  `k<callback>`                           |  Custom operator                       |
+|  `A<type>(default)[length]`              |  Optional array of given type          |
+|  `a<type>[length]`                       |  Array of given type                   |
 |  `B(binary)`                             |  Optional binary number                |
 |  `b`                                     |  Binary number                         |
-|  `N(any format number)`                  |  Optional number                       |
-|  `n`                                     |  Number                                |
 |  `C(character)`                          |  Optional character                    |
 |  `c`                                     |  Character                             |
-|  `I(integer)`                            |  Optional integer                      |
-|  `i`                                     |  Integer                               |
 |  `D(integer)`                            |  Optional integer                      |
 |  `d`                                     |  Integer                               |
-|  `H(hex value)`                          |  Optional hex number                   |
-|  `h`                                     |  Hex number                            |
-|  `X(hex value)`                          |  Optional hex number                   |
-|  `x`                                     |  Hex number                            |
-|  `O(octal value)`                        |  Optional octal value                  |
-|  `o`                                     |  Octal value                           |
+|  `E<specification>(default)`             |  Optional enumeration of given layout  |
+|  `e<specification>`                      |  Enumeration of given layout           |
 |  `F(float)`                              |  Optional floating point number        |
 |  `f`                                     |  Floating point number                 |
 |  `G(float/INFINITY/-INFINITY/NAN/NAN_E)` |  Optional float with IEEE definitions  |
 |  `g`                                     |  Float with IEEE definitions           |
-|  `{`                                     |  Open quiet section                    |
-|  `}`                                     |  Close quiet section                   |
+|  `H(hex value)`                          |  Optional hex number                   |
+|  `h`                                     |  Hex number                            |
+|  `I(integer)`                            |  Optional integer                      |
+|  `i`                                     |  Integer                               |
+|  `K<callback>(any format number)`        |  Optional custom operator              |
+|  `k<callback>`                           |  Custom operator                       |
+|  `L(true/false)`                         |  Optional logical truthity             |
+|  `l`                                     |  Logical truthity                      |
+|  `N(any format number)`                  |  Optional number                       |
+|  `n`                                     |  Number                                |
+|  `O(octal value)`                        |  Optional octal value                  |
+|  `o`                                     |  Octal value                           |
 |  `P<delimiters>`                         |  Multiple delimiters change            |
 |  `p<delimiter>`                          |  Delimiter change                      |
-|  `S(string)[length]`                     |  Optional string                       |
-|  `s[length]`                             |  String                                |
-|  `Z(string)[length]`                     |  Optional packed string                |
-|  `z[length]`                             |  Packed string                         |
-|  `U(any format number)`                  |  Optional user (bot/player)            |
-|  `u`                                     |  User (bot/player)                     |
 |  `Q(any format number)`                  |  Optional bot (bot)                    |
 |  `q`                                     |  Bot (bot)                             |
 |  `R(any format number)`                  |  Optional player (player)              |
 |  `r`                                     |  Player (player)                       |
-|  `A<type>(default)[length]`              |  Optional array of given type          |
-|  `a<type>[length]`                       |  Array of given type                   |
-|  `E<specification>(default)`             |  Optional enumeration of given layout  |
-|  `e<specification>`                      |  Enumeration of given layout           |
+|  `S(string)[length]`                     |  Optional string                       |
+|  `s[length]`                             |  String                                |
+|  `U(any format number)`                  |  Optional user (bot/player)            |
+|  `u`                                     |  User (bot/player)                     |
+|  `X(hex value)`                          |  Optional hex number                   |
+|  `x`                                     |  Hex number                            |
+|  `Z(string)[length]`                     |  Optional packed string                |
+|  `z[length]`                             |  Packed string                         |
 |  `'string'`                              |  Search string                         |
+|  `{`                                     |  Open quiet section                    |
+|  `}`                                     |  Close quiet section                   |
 |  `%`                                     |  Deprecated optional specifier prefix  |
 |  `?`                                     |  Local options specifier               |
 
