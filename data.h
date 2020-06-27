@@ -27,7 +27,7 @@
 #pragma once
 
 void
-	RestoreOpts(int);
+	RestoreOpts(int, int, int);
 
 char
 	GetSingleType(char ** format);
@@ -49,6 +49,9 @@ int
 
 int
 	GetHex(char ** const input);
+
+unsigned int
+	GetColour(char ** const input, int * type, unsigned int alpha);
 
 int
 	GetBool(char ** const input);

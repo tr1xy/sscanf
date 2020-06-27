@@ -59,8 +59,10 @@ void
 //    Disable all prints.
 //  
 int
+	gAlpha = 0xFF,
+	gForms = -1,
 	gOptions = 0;
-
+	
 cell * args_s::Next()
 {
 	cell * cptr;
@@ -79,9 +81,11 @@ void args_s::Restore()
 };
 
 void
-	RestoreOpts(int opt)
+	RestoreOpts(int opt, int alpha, int forms)
 {
 	gOptions = opt;
+	gAlpha = alpha;
+	gForms = forms;
 	if (gOptions & 8) logprintf = qlog;
 	else logprintf = real_logprintf;
 }
@@ -187,6 +191,18 @@ void
 					logprintf("sscanf error: No option value.");
 				}
 		}
+	}
+	else if (!strincmp(name, "SSCANF_ALPHA", 12))
+	{
+		gAlpha = (value & 0xFF) | (gAlpha & 0xFFFFFF00);
+	}
+	else if (!strincmp(name, "SSCANF_COLOUR_FORMS", 19))
+	{
+		gForms = value;
+	}
+	else if (!strincmp(name, "SSCANF_ARGB", 11))
+	{
+		gAlpha = (gAlpha & 0xFF) | (value ? 0x100 : 0);
 	}
 	else if (!strincmp(name, "OLD_DEFAULT_KUSTOM", 18) || !strincmp(name, "OLD_DEFAULT_CUSTOM", 18))
 	{
@@ -594,6 +610,109 @@ int
 			}
 		}
 	}*/
+}
+
+unsigned int
+	GetColour(char ** const input, int * type, unsigned int alpha)
+{
+	char *
+		str = *input;
+	char
+		prefix = 0; // `0x` = 1, `{` = 2, `#` = 3, `` = 4, invalid = 0.
+	*type = 0; // Reset.
+	switch (*str)
+	{
+	case '0':
+		if (*(str + 1) == 'x' || *(str + 1) == 'X')
+		{
+			// Check there is real data, otherwise it's bad.
+			str += 2;
+			if ((*str < '0') || ((*str > '9') && ((*str | 0x20) < 'a')) || ((*str | 0x20) > 'f'))
+			{
+				*input = str - 1;
+				return 0;
+			}
+			prefix = 1;
+		}
+		else
+		{
+			prefix = 4;
+		}
+		break;
+	case '{':
+		prefix = 2;
+		++str;
+		break;
+	case '#':
+		prefix = 3;
+		++str;
+		break;
+	default:
+		prefix = 4;
+		break;
+	}
+	// Get the underlying HEX value.
+	*input = str;
+	unsigned int ret = (unsigned int)GetHexValue(input);
+	// Determine the input type.
+	switch (prefix)
+	{
+	case 1:
+		if (*input - str == 6)
+		{
+			*type = 4;
+		}
+		else if (*input - str == 8)
+		{
+			*type = 32;
+			return ret;
+		}
+		break;
+	case 2:
+		if (*input - str == 6 && **input == '}')
+		{
+			++(*input);
+			*type = 16;
+		}
+		break;
+	case 3:
+		if (*input - str == 3)
+		{
+			// Expand out the 3-digit values to 6-digit values.
+			ret =
+				((ret >> 16 & 0x00F) * 0x011 << 16) |
+				((ret >>  8 & 0x00F) * 0x011 <<  8) |
+				((ret >>  0 & 0x00F) * 0x011 <<  0)	;
+			*type = 1;
+		}
+		else if (*input - str == 6)
+		{
+			*type = 2;
+		}
+		break;
+	case 4:
+		if (*input - str == 6)
+		{
+			*type = 8;
+		}
+		else if (*input - str == 8)
+		{
+			*type = 64;
+			return ret;
+		}
+		break;
+	}
+	// Add in the alpha.
+	if (alpha & 0xFFFFFF00)
+	{
+		// ARGB.
+		return ret | (alpha << 24);
+	}
+	else
+	{
+		// RGBA.
+		return (ret << 8) | alpha;
+	}
 }
 
 unsigned int

@@ -37,6 +37,8 @@ extern logprintf_t
 	logprintf;
 
 extern int
+	gAlpha,
+	gForms,
 	gOptions;
 
 extern unsigned int
@@ -66,6 +68,16 @@ bool
 {
 	*ret = GetHex(input);
 	return GetReturn(input);
+}
+
+bool
+	DoM(char ** input, unsigned int * ret)
+{
+	int type;
+	// Colours.
+	*ret = GetColour(input, &type, gAlpha);
+	// Check the given form is allowed.
+	return (gForms & type) && GetReturn(input);
 }
 
 bool
@@ -687,6 +699,19 @@ bool
 		return false;
 	}
 	*ret = GetHex(input);
+	return GetReturnDefault(input);
+}
+
+bool
+	DoMD(char ** input, unsigned int * ret)
+{
+	if (!FindDefaultStart(input))
+	{
+		return false;
+	}
+	int type;
+	*ret = GetColour(input, &type, gAlpha);
+	// Don't check the form is specified in defaults.
 	return GetReturnDefault(input);
 }
 

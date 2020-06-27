@@ -45,7 +45,7 @@
 	#error sscanf (possibly the PAWN version) already defined.
 #endif
 
-native SSCANF__(const file[], const line, const data[], const format[], {Float,_}:...);
+native SSCANF__(const data[], const format[], {Float,_}:...);
 native UNFORMAT__(const data[], const format[], {Float,_}:...) = SSCANF__;
 native SSCANF_Init(players, invalid, len);
 native SSCANF_Join(playerid, const name[], npc);
@@ -59,11 +59,11 @@ native SSCANF_Option(const name[], value);
 #endif
 
 #if defined __PawnBuild
-	#define sscanf( SSCANF__(__file,__line,
-	#define unformat( SSCANF__(__file,__line,
+	#define sscanf( SSCANF__(
+	#define unformat( SSCANF__(
 #else
-	#define sscanf( SSCANF__(SSCANF_UNK_,-1
-	#define unformat( SSCANF__(SSCANF_FOM_,-1
+	#define sscanf( SSCANF__(
+	#define unformat( SSCANF__(
 #endif
 
 stock const
@@ -320,12 +320,12 @@ static stock
 #define SSCANF_Leave
 
 #if defined __PawnBuild
-	#define extract%0->%1; EXTRN%1;UNFORMAT__(__file,__line,_:EXTRV:EXTRX:%0,""#,%1,,);
+	#define extract%0->%1; EXTRN%1;UNFORMAT__(_:EXTRV:EXTRX:%0,""#,%1,,);
 #else
-	#define extract%0->%1; EXTRN%1;UNFORMAT__(SSCANF_EXT_,-1,_:EXTRV:EXTRX:%0,""#,%1,,);
+	#define extract%0->%1; EXTRN%1;UNFORMAT__(_:EXTRV:EXTRX:%0,""#,%1,,);
 #endif
 
-#define UNFORMAT__(%7,%8,_:EXTRV:EXTRX:%0,""#,%1);%2else if (UNFORMAT__(%7,%8,_:EXTRV:EXTRX:%0,""#,%1))
+#define UNFORMAT__(_:EXTRV:EXTRX:%0,""#,%1);%2else if (UNFORMAT__(_:EXTRV:EXTRX:%0,""#,%1))
 
 #define EXTRV:EXTRX:%0<%3>%4#,%9new%1,%2) EXTRZ:EXTRY:%0%4#P<%3>,|||%1|||%2)
 #define EXTRZ:EXTRY:%0#P<,> EXTRY:%0"P<,>"#

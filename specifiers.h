@@ -36,6 +36,9 @@ bool
 	DoH(char ** input, int * ret);
 
 bool
+	DoM(char ** input, unsigned int * ret);
+
+bool
 	DoO(char ** input, int * ret);
 
 bool
@@ -73,6 +76,9 @@ bool
 
 bool
 	DoHD(char ** input, int * ret);
+
+bool
+	DoMD(char ** input, unsigned int * ret);
 
 bool
 	DoOD(char ** input, int * ret);

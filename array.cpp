@@ -195,6 +195,11 @@ int
 		case 'h':
 		case 'x':
 			DO(int, H)
+		case 'M':
+			DX(unsigned int, M)
+			// FALLTHROUGH
+		case 'm':
+			DO(unsigned int, M)
 		case 'O':
 			DX(int, O)
 			// FALLTHROUGH

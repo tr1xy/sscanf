@@ -72,6 +72,8 @@ extern char *
 	g_szPlayerNames;
 
 extern int
+	gAlpha,
+	gForms,
 	gOptions;
 
 AMX *
@@ -112,7 +114,7 @@ AMX *
 	if (Do##n(&string, &b)) {    \
 		SAVE_VALUE((cell)b);     \
 		break; }                 \
-	RestoreOpts(defaultOpts);    \
+	RestoreOpts(defaultOpts, defaultAlpha, defaultForms);    \
 	return SSCANF_FAIL_RETURN; }
 
 #define DOV(m,n)                 \
@@ -125,13 +127,13 @@ AMX *
 	if (Do##n(&string, &b)) {    \
 		SAVE_VALUE_F(b)          \
 		break; }                 \
-	RestoreOpts(defaultOpts);      \
+	RestoreOpts(defaultOpts, defaultAlpha, defaultForms);      \
 	return SSCANF_FAIL_RETURN; }
 
 // Macros for the default values.  None of these have ifs as the return value
 // of GetReturnDefault is always true - we don't penalise users for the
 // mistakes of the coder - they will get warning messages if they get the
-// format wrong, and I don't know of any mistkes which aren't warned about
+// format wrong, and I don't know of any mistakes which aren't warned about
 // (admittedly a silly statement as if I did I would have fixed them).
 #define DE(m,n)                  \
 	{m b;                        \
@@ -240,6 +242,8 @@ static cell AMX_NATIVE_CALL
 	}
 	// Save the default options so we can have local modifications.
 	int
+		defaultAlpha = gAlpha,
+		defaultForms = gForms,
 		defaultOpts = gOptions;
 	InitialiseDelimiter();
 	// Skip leading space.
@@ -279,7 +283,7 @@ static cell AMX_NATIVE_CALL
 				// Started a quiet section but never explicitly ended it.
 				logprintf("sscanf warning: Unclosed quiet section.");
 			}
-			RestoreOpts(defaultOpts);
+			RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 			return SSCANF_TRUE_RETURN;
 		}
 		else if (IsWhitespace(*format))
@@ -325,6 +329,11 @@ static cell AMX_NATIVE_CALL
 				case 'h':
 				case 'x':
 					DO(int, H)
+				case 'M':
+					DX(unsigned int, M)
+					// FALLTHROUGH
+				case 'm':
+					DO(unsigned int, M)
 				case 'O':
 					DX(int, O)
 					// FALLTHROUGH
@@ -765,14 +774,14 @@ static cell AMX_NATIVE_CALL
 					{
 						break;
 					}
-					RestoreOpts(defaultOpts);
+					RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 					return SSCANF_FAIL_RETURN;
 				case 'a':
 					if (DoA(&format, &string, args, false, doSave))
 					{
 						break;
 					}
-					RestoreOpts(defaultOpts);
+					RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 					return SSCANF_FAIL_RETURN;
 				case 'E':
 					// We need the default values here.
@@ -780,14 +789,14 @@ static cell AMX_NATIVE_CALL
 					{
 						break;
 					}
-					RestoreOpts(defaultOpts);
+					RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 					return SSCANF_FAIL_RETURN;
 				case 'e':
 					if (DoE(&format, &string, args, false, doSave))
 					{
 						break;
 					}
-					RestoreOpts(defaultOpts);
+					RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 					return SSCANF_FAIL_RETURN;
 				case 'K':
 				{
@@ -815,7 +824,7 @@ static cell AMX_NATIVE_CALL
 							break;
 						}
 					}
-					RestoreOpts(defaultOpts);
+					RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 					return SSCANF_FAIL_RETURN;
 				}
 				case 'k':
@@ -838,7 +847,7 @@ static cell AMX_NATIVE_CALL
 							break;
 						}
 					}
-					RestoreOpts(defaultOpts);
+					RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 					return SSCANF_FAIL_RETURN;
 				}
 				case '\'':
@@ -894,7 +903,7 @@ static cell AMX_NATIVE_CALL
 							if (!find)
 							{
 								// Didn't find the string
-								RestoreOpts(defaultOpts);
+								RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 								return SSCANF_FAIL_RETURN;
 							}
 							// Found the string.  Update the current string
@@ -915,7 +924,7 @@ static cell AMX_NATIVE_CALL
 								find = strstr(string, format);
 							if (!find)
 							{
-								RestoreOpts(defaultOpts);
+								RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 								return SSCANF_FAIL_RETURN;
 							}
 							string = find + (write - format);
@@ -968,7 +977,7 @@ static cell AMX_NATIVE_CALL
 				// Started a quiet section but never explicitly ended it.
 				logprintf("sscanf warning: Unclosed quiet section.");
 			}
-			RestoreOpts(defaultOpts);
+			RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 			return SSCANF_TRUE_RETURN;
 		}
 		else if (IsWhitespace(*format))
@@ -994,6 +1003,8 @@ static cell AMX_NATIVE_CALL
 				case 'H':
 				case 'X':
 					DE(int, H)
+				case 'M':
+					DE(unsigned int, M)
 				case 'O':
 					DE(int, O)
 				case 'F':
@@ -1011,14 +1022,14 @@ static cell AMX_NATIVE_CALL
 					{
 						break;
 					}
-					RestoreOpts(defaultOpts);
+					RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 					return SSCANF_FAIL_RETURN;
 				case 'E':
 					if (DoE(&format, NULL, args, true, doSave))
 					{
 						break;
 					}
-					RestoreOpts(defaultOpts);
+					RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 					return SSCANF_FAIL_RETURN;
 				case 'K':
 					if (doSave)
@@ -1038,7 +1049,7 @@ static cell AMX_NATIVE_CALL
 							break;
 						}
 					}
-					RestoreOpts(defaultOpts);
+					RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 					return SSCANF_FAIL_RETURN;
 				case '{':
 					if (doSave)
@@ -1151,6 +1162,7 @@ static cell AMX_NATIVE_CALL
 				case 'z':
 				case 'u':
 				case 'x':
+				case 'm':
 					// These are non optional items, but the input string
 					// didn't include them, so we fail - this is in fact the
 					// most basic definition of a fail (the original)!  We
@@ -1160,7 +1172,7 @@ static cell AMX_NATIVE_CALL
 					// doesn't matter - the coder should have tested for those
 					// things, and the more important thing is that the user
 					// didn't enter the correct data.
-					RestoreOpts(defaultOpts);
+					RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 					return SSCANF_FAIL_RETURN;
 				case '?':
 					GetMultiType(&format);
@@ -1227,7 +1239,7 @@ static cell AMX_NATIVE_CALL
 	}
 	// No more parameters and no more format specifiers which could be read
 	// from - this is a valid return!
-	RestoreOpts(defaultOpts);
+	RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 	return SSCANF_TRUE_RETURN;
 }
 
@@ -1416,7 +1428,7 @@ static cell AMX_NATIVE_CALL
 AMX_NATIVE_INFO
 	sscanfNatives[] =
 		{
-			{"sscanf", n_sscanf},
+			{"SSCANF__", n_sscanf},
 			{"SSCANF_Init", n_SSCANF_Init},
 			{"SSCANF_Join", n_SSCANF_Join},
 			{"SSCANF_Leave", n_SSCANF_Leave},
