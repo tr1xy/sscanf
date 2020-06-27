@@ -67,7 +67,7 @@ extern logprintf_t
 	return SSCANF_FAIL_RETURN; }
 
 #define OPTIONAL_INVALID \
-	logprintf("sscanf warning: Optional types invalid in enum specifiers, consider using 'E'.")
+	SscanfWarning("Optional types invalid in enum specifiers, consider using 'E'.")
 
 #define DX(m,n) \
 	OPTIONAL_INVALID;
@@ -172,13 +172,13 @@ int
 					else if (cptr)
 					{
 						// Already in a quiet section.
-						logprintf("sscanf warning: Can't have nestled quiet sections.");
+						SscanfWarning("Can't have nestled quiet sections.");
 					}
 					continue;
 				case '}':
 					if (doSave)
 					{
-						logprintf("sscanf warning: Not in a quiet section.");
+						SscanfWarning("Not in a quiet section.");
 					}
 					else
 					{
@@ -188,7 +188,7 @@ int
 						}
 						else
 						{
-							logprintf("sscanf warning: Can't remove quiet in enum.");
+							SscanfWarning("Can't remove quiet in enum.");
 						}
 					}
 					continue;
@@ -201,7 +201,7 @@ int
 						else return SSCANF_FAIL_RETURN;
 						continue;
 					}
-					//logprintf("sscanf warning: You can't have an optional delimiter.");
+					//SscanfWarning("You can't have an optional delimiter.");
 					// FALLTHROUGH
 				case 'p':
 					// 'P' doesn't exist.
@@ -319,7 +319,7 @@ int
 				case 'u':
 					if (*format == '[')
 					{
-						logprintf("sscanf warning: User arrays are not supported in enums.");
+						SscanfWarning("User arrays are not supported in enums.");
 						SkipLength(&format);
 					}
 					#define DoU(m,n) DoU(m,n,0)
@@ -339,7 +339,7 @@ int
 				case 'q':
 					if (*format == '[')
 					{
-						logprintf("sscanf warning: User arrays are not supported in enums.");
+						SscanfWarning("User arrays are not supported in enums.");
 						SkipLength(&format);
 					}
 					#define DoQ(m,n) DoQ(m,n,0)
@@ -359,7 +359,7 @@ int
 				case 'r':
 					if (*format == '[')
 					{
-						logprintf("sscanf warning: User arrays are not supported in enums.");
+						SscanfWarning("User arrays are not supported in enums.");
 						SkipLength(&format);
 					}
 					#define DoR(m,n) DoR(m,n,0)
@@ -375,12 +375,12 @@ int
 					break;
 				case 'A':
 				case 'a':
-					logprintf("sscanf error: Arrays are not supported in enums.");
+					SscanfError("Arrays are not supported in enums.");
 					*input = string;
 					return SSCANF_FAIL_RETURN;
 				case 'E':
 				case 'e':
-					logprintf("sscanf error: Enums are not supported in enums.");
+					SscanfError("Enums are not supported in enums.");
 					*input = string;
 					return SSCANF_FAIL_RETURN;
 				case '\'':
@@ -452,7 +452,7 @@ int
 						}
 						else
 						{
-							logprintf("sscanf warning: Unclosed string literal.");
+							SscanfWarning("Unclosed string literal.");
 							char *
 								find = strstr(string, format);
 							if (!find)
@@ -466,10 +466,10 @@ int
 					}
 					break;
 				case '?':
-					logprintf("sscanf error: Options are not supported in enums.");
+					SscanfError("Options are not supported in enums.");
 					return SSCANF_FAIL_RETURN;
 				case '%':
-					logprintf("sscanf warning: sscanf specifiers do not require '%' before them.");
+					SscanfWarning("sscanf specifiers do not require '%' before them.");
 					continue;
 				case '-':
 					{
@@ -511,12 +511,12 @@ int
 								break;
 							case 'P':
 							case 'p':
-								logprintf("sscanf warning: A minus delimiter makes no sense.");
+								SscanfWarning("A minus delimiter makes no sense.");
 								len = 0;
 								break;
 							case '{':
 							case '}':
-								logprintf("sscanf warning: A minus quiet section makes no sense.");
+								SscanfWarning("A minus quiet section makes no sense.");
 								len = 0;
 								break;
 							case 'U':
@@ -539,7 +539,7 @@ int
 							case 'E':
 								OPTIONAL_INVALID;
 							case 'e':
-								logprintf("sscanf error: Enums are not supported in enums.");
+								SscanfError("Enums are not supported in enums.");
 								*input = string;
 								return SSCANF_FAIL_RETURN;
 							case 'Z':
@@ -555,19 +555,19 @@ int
 								len = GetLength(&format, args);
 								break;
 							case '?':
-								logprintf("sscanf warning: A minus option makes no sense.");
+								SscanfWarning("A minus option makes no sense.");
 								len = 0;
 								break;
 							case '%':
-								logprintf("sscanf warning: sscanf specifiers do not require '%' before them.");
+								SscanfWarning("sscanf specifiers do not require '%' before them.");
 								len = 0;
 								break;
 							case '-':
-								logprintf("sscanf warning: A minus minus makes no sense.");
+								SscanfWarning("A minus minus makes no sense.");
 								len = 0;
 								break;
 							default:
-								logprintf("sscanf warning: Unknown format specifier '%c', skipping.", *(format - 1));
+								SscanfWarning("Unknown format specifier '%c', skipping.", *(format - 1));
 								len = 0;
 								break;
 						}
@@ -578,7 +578,7 @@ int
 					}
 					break;
 				default:
-					logprintf("sscanf warning: Unknown format specifier '%c', skipping.", *(format - 1));
+					SscanfWarning("Unknown format specifier '%c', skipping.", *(format - 1));
 					continue;
 			}
 			// Loop cleanup - only skip one spacer so that we can detect
@@ -653,7 +653,7 @@ bool
 				if (opts == *defaults)
 				{
 					// No defaults found.
-					logprintf("sscanf warning: Empty default values.");
+					SscanfWarning("Empty default values.");
 					optional = false;
 				}
 				// Found a valid end.  Make it null for
@@ -665,7 +665,7 @@ bool
 			}
 			else
 			{
-				logprintf("sscanf warning: Unclosed default value.");
+				SscanfWarning("Unclosed default value.");
 			}
 			if (optional)
 			{
@@ -691,7 +691,7 @@ bool
 					case SSCANF_TRUE_RETURN:
 						break;
 					case SSCANF_CONT_RETURN:
-						logprintf("sscanf error: Insufficient default values.");
+						SscanfError("Insufficient default values.");
 						// FALLTHROUGH
 					default:
 						RestoreDelimiter();
@@ -704,7 +704,7 @@ bool
 		}
 		else
 		{
-			logprintf("sscanf warning: No default value found.");
+			SscanfWarning("No default value found.");
 			optional = false;
 		}
 	}

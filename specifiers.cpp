@@ -216,7 +216,7 @@ bool
 				// there's no point - it's just extra work and we know it's OK.
 				// We set the null before incrementing to ensure it's included
 				// in the output.
-				logprintf("sscanf warning: String buffer overflow.");
+				SscanfWarning("String buffer overflow.");
 				// Removed the break - discard the rest of the string.
 				//break;
 			}
@@ -256,7 +256,7 @@ bool
 			++i;
 			if (i == length)
 			{
-				logprintf("sscanf warning: String buffer overflow.");
+				SscanfWarning("String buffer overflow.");
 			}
 			else if (i < length)
 			{
@@ -291,7 +291,7 @@ bool
 			++i;
 			if (i == length)
 			{
-				logprintf("sscanf warning: String buffer overflow.");
+				SscanfWarning("String buffer overflow.");
 			}
 			else if (i < length)
 			{
@@ -889,16 +889,16 @@ bool
 	}
 	else
 	{
-		logprintf("sscanf warning: Unclosed default value.");
+		SscanfWarning("Unclosed default value.");
 		// Save the return.
 		*input = string;
-		logprintf("sscanf error: String/array must include a length, please add a destination size.");
+		SscanfError("String/array must include a length, please add a destination size.");
 		*length = 1;
 	}
 	// Add a null terminator.
 	if (i >= *length)
 	{
-		logprintf("sscanf warning: String buffer overflow.");
+		SscanfWarning("String buffer overflow.");
 		*(ret + (*length - 1)) = '\0';
 	}
 	else

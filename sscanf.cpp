@@ -103,6 +103,20 @@ AMX *
 			if (((result) = (char *)alloca((amx_length_ + 1) * sizeof (*(result)))) != NULL) \
 				amx_GetString((result), amx_cstr_, sizeof (*(result)) > 1, amx_length_ + 1); \
 			else {                                                                           \
+				SscanfError("Unable to allocate memory.");                                   \
+				return SSCANF_FAIL_RETURN; } }                                               \
+		else (result) = ""; }                                                                \
+	while (false)
+
+#define SAFE_STR_PARAM(amx,param,result)                                                     \
+	do {                                                                                     \
+		cell * amx_cstr_; int amx_length_;                                                   \
+		amx_GetAddr((amx), (param), &amx_cstr_);                                             \
+		amx_StrLen(amx_cstr_, &amx_length_);                                                 \
+		if (amx_length_ > 0) {                                                               \
+			if (((result) = (char *)alloca((amx_length_ + 1) * sizeof (*(result)))) != NULL) \
+				amx_GetString((result), amx_cstr_, sizeof (*(result)) > 1, amx_length_ + 1); \
+			else {                                                                           \
 				logprintf("sscanf error: Unable to allocate memory.");                       \
 				return SSCANF_FAIL_RETURN; } }                                               \
 		else (result) = ""; }                                                                \
@@ -175,66 +189,73 @@ bool
 void
 	DoOptions(char *, cell);
 
-// native sscanf(const data[], const format[], (Float,_}:...);
-static cell AMX_NATIVE_CALL
-	n_sscanf(AMX * amx, cell * params)
+char
+	* gFormat = 0,
+	* gCallFile = 0;
+
+int
+	gCallLine = 0;
+
+cell
+	* gCallResolve = 0;
+
+bool SscanfErrLine()
 {
-	if (g_iTrueMax == 0)
+	if (gCallResolve == 0)
 	{
-		logprintf("sscanf error: System not initialised.");
-		return SSCANF_FAIL_RETURN;
+		gCallFile = "sscanf";
+		gCallLine = -1;
 	}
-	// Friendly note, the most complex set of specifier additions is:
-	// 
-	//  A<i>(10, 11)[5]
-	// 
-	// In that exact order - type, default, size.  It's very opposite to how
-	// it's done in code, where you would do the eqivalent to:
-	// 
-	//  <i>[5] = {10, 11}
-	// 
-	// But this method is vastly simpler to parse in this context!  Technically
-	// you can, due to legacy support for 'p', do:
-	// 
-	//  Ai(10, 11)[5]
-	// 
-	// But you will get an sscanf warning, and I may remove that ability from
-	// the start - that will mean a new function, but an easy to write one.
-	// In fact the most complex will probably be something like:
-	// 
-	//  E<ifs[32]s[8]d>(10, 12.3, Hello there, Hi, 42)
-	// 
-	// Get the number of parameters passed.  We add one as the indexes are out
-	// by one (OBOE - Out By One Error) due to params[0] being the parameter
-	// count, not an actual parameter.
-	const int
-		paramCount = ((int)params[0] / 4) + 1;
-	// Could add a check for only 3 parameters here - I can't think of a time
-	// when you would not want any return values at all, but that doesn't mean
-	// they don't exist - you could just want to check but not save the format.
-	// Update - that is now a possibility with the '{...}' specifiers.
-	if (paramCount < (2 + 1))
+	else if (gCallFile == 0)
 	{
-		logprintf("sscanf error: Missing required parameters.");
-		return SSCANF_FAIL_RETURN;
+		// Extract the filename.
+		int length;
+		amx_StrLen(gCallResolve, &length);
+		if (length > 0)
+		{
+			if ((gCallFile = (char *)malloc((length + 1))) != NULL)
+			{
+				amx_GetString(gCallFile, gCallResolve, false, length + 1);
+			}
+			else
+			{
+				logprintf("sscanf error: Unable to allocate memory.");
+				gCallFile = "sscanf";
+				gCallLine = -1;
+				gCallResolve = 0;
+			}
+		}
+		else
+		{
+			gCallFile = "sscanf";
+			gCallLine = -1;
+			gCallResolve = 0;
+		}
 	}
+	return gCallLine > 0;
+}
+
+static cell AMX_NATIVE_CALL
+	Sscanf(AMX * amx, cell * params, const int paramCount)
+{
 	struct args_s
-		args{ amx, params, 3, 3 };
+		args{ amx, params, 5, 5 };
 	//else if (paramCount == (2 + 1))
 	//{
 		// Only have an input and a specifier - better hope the whole specifier
-		// is quite (i.e. enclosed in '{...}').
+		// is quiet (i.e. enclosed in '{...}').
 	//}
 	// Set up function wide values.
 	// Get and check the main data.
+	// Pointer to the current format specifier.
+	// Doesn't use `SscanfError`, because we don't have the format specifier yet.
+	SAFE_STR_PARAM(amx, params[4], gFormat);
 	// Pointer to the current input data.
 	char *
 		string;
-	STR_PARAM(amx, params[1], string);
-	// Pointer to the current format specifier.
+	STR_PARAM(amx, params[3], string);
 	char *
-		format;
-	STR_PARAM(amx, params[2], format);
+		format = gFormat;
 	// Check for CallRemoteFunction style null strings and correct.
 	if (string[0] == '\1' && string[1] == '\0')
 	{
@@ -276,12 +297,12 @@ static cell AMX_NATIVE_CALL
 			// considered OK as that is likely a user's fault.
 			if (args.Pos < paramCount)
 			{
-				logprintf("sscanf warning: Format specifier does not match parameter count.");
+				SscanfWarning("Format specifier does not match parameter count.");
 			}
 			if (!doSave)
 			{
 				// Started a quiet section but never explicitly ended it.
-				logprintf("sscanf warning: Unclosed quiet section.");
+				SscanfWarning("Unclosed quiet section.");
 			}
 			RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 			return SSCANF_TRUE_RETURN;
@@ -357,13 +378,13 @@ static cell AMX_NATIVE_CALL
 					else
 					{
 						// Already in a quiet section.
-						logprintf("sscanf warning: Can't have nestled quiet sections.");
+						SscanfWarning("Can't have nestled quiet sections.");
 					}
 					continue;
 				case '}':
 					if (doSave)
 					{
-						logprintf("sscanf warning: Not in a quiet section.");
+						SscanfWarning("Not in a quiet section.");
 					}
 					else
 					{
@@ -478,12 +499,12 @@ static cell AMX_NATIVE_CALL
 							if (gOptions & 1)
 							{
 								// Incompatible combination.
-								logprintf("sscanf error: 'U(name)[len]' is incompatible with OLD_DEFAULT_NAME.");
+								SscanfError("'U(name)[len]' is incompatible with OLD_DEFAULT_NAME.");
 								return SSCANF_FAIL_RETURN;
 							}
 							else if (len < 2)
 							{
-								logprintf("sscanf error: 'U(num)[len]' length under 2.");
+								SscanfError("'U(num)[len]' length under 2.");
 								return SSCANF_FAIL_RETURN;
 							}
 							else if (doSave)
@@ -509,7 +530,7 @@ static cell AMX_NATIVE_CALL
 							len = GetLength(&format, args);
 						if (len < 2)
 						{
-							logprintf("sscanf error: 'u[len]' length under 2.");
+							SscanfError("'u[len]' length under 2.");
 							return SSCANF_FAIL_RETURN;
 						}
 						else
@@ -579,12 +600,12 @@ static cell AMX_NATIVE_CALL
 							if (gOptions & 1)
 							{
 								// Incompatible combination.
-								logprintf("sscanf error: 'Q(name)[len]' is incompatible with OLD_DEFAULT_NAME.");
+								SscanfError("'Q(name)[len]' is incompatible with OLD_DEFAULT_NAME.");
 								return SSCANF_FAIL_RETURN;
 							}
 							else if (len < 2)
 							{
-								logprintf("sscanf error: 'Q(num)[len]' length under 2.");
+								SscanfError("'Q(num)[len]' length under 2.");
 								return SSCANF_FAIL_RETURN;
 							}
 							else if (doSave)
@@ -610,7 +631,7 @@ static cell AMX_NATIVE_CALL
 							len = GetLength(&format, args);
 						if (len < 2)
 						{
-							logprintf("sscanf error: 'q[len]' length under 2.");
+							SscanfError("'q[len]' length under 2.");
 							return SSCANF_FAIL_RETURN;
 						}
 						else
@@ -680,12 +701,12 @@ static cell AMX_NATIVE_CALL
 							if (gOptions & 1)
 							{
 								// Incompatible combination.
-								logprintf("sscanf error: 'R(name)[len]' is incompatible with OLD_DEFAULT_NAME.");
+								SscanfError("'R(name)[len]' is incompatible with OLD_DEFAULT_NAME.");
 								return SSCANF_FAIL_RETURN;
 							}
 							else if (len < 2)
 							{
-								logprintf("sscanf error: 'R(num)[len]' length under 2.");
+								SscanfError("'R(num)[len]' length under 2.");
 								return SSCANF_FAIL_RETURN;
 							}
 							else if (doSave)
@@ -711,7 +732,7 @@ static cell AMX_NATIVE_CALL
 							len = GetLength(&format, args);
 						if (len < 2)
 						{
-							logprintf("sscanf error: 'r[len]' length under 2.");
+							SscanfError("'r[len]' length under 2.");
 							return SSCANF_FAIL_RETURN;
 						}
 						else
@@ -919,7 +940,7 @@ static cell AMX_NATIVE_CALL
 						}
 						else
 						{
-							logprintf("sscanf warning: Unclosed string literal.");
+							SscanfWarning("Unclosed string literal.");
 							char *
 								find = strstr(string, format);
 							if (!find)
@@ -941,10 +962,10 @@ static cell AMX_NATIVE_CALL
 						continue;
 					}
 				case '%':
-					logprintf("sscanf warning: sscanf specifiers do not require '%' before them.");
+					SscanfWarning("sscanf specifiers do not require '%' before them.");
 					continue;
 				default:
-					logprintf("sscanf warning: Unknown format specifier '%c', skipping.", *(format - 1));
+					SscanfWarning("Unknown format specifier '%c', skipping.", *(format - 1));
 					continue;
 			}
 			// Loop cleanup - only skip one spacer so that we can detect
@@ -971,11 +992,11 @@ static cell AMX_NATIVE_CALL
 		// Loop through if there's still parameters remaining.
 		if (!*format)
 		{
-			logprintf("sscanf warning: Format specifier does not match parameter count.");
+			SscanfWarning("Format specifier does not match parameter count.");
 			if (!doSave)
 			{
 				// Started a quiet section but never explicitly ended it.
-				logprintf("sscanf warning: Unclosed quiet section.");
+				SscanfWarning("Unclosed quiet section.");
 			}
 			RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 			return SSCANF_TRUE_RETURN;
@@ -1059,13 +1080,13 @@ static cell AMX_NATIVE_CALL
 					else
 					{
 						// Already in a quiet section.
-						logprintf("sscanf warning: Can't have nestled quiet sections.");
+						SscanfWarning("Can't have nestled quiet sections.");
 					}
 					break;
 				case '}':
 					if (doSave)
 					{
-						logprintf("sscanf warning: Not in a quiet section.");
+						SscanfWarning("Not in a quiet section.");
 					}
 					else
 					{
@@ -1105,7 +1126,7 @@ static cell AMX_NATIVE_CALL
 					}
 					break;
 				case 'P':
-					//logprintf("sscanf warning: You can't have an optional delimiter.");
+					//SscanfWarning("You can't have an optional delimiter.");
 					GetMultiType(&format);
 					continue;
 					// FALLTHROUGH
@@ -1138,7 +1159,7 @@ static cell AMX_NATIVE_CALL
 						}
 						else
 						{
-							logprintf("sscanf warning: Unclosed string literal.");
+							SscanfWarning("Unclosed string literal.");
 						}
 					}
 					break;
@@ -1178,10 +1199,10 @@ static cell AMX_NATIVE_CALL
 					GetMultiType(&format);
 					continue;
 				case '%':
-					logprintf("sscanf warning: sscanf specifiers do not require '%' before them.");
+					SscanfWarning("sscanf specifiers do not require '%' before them.");
 					break;
 				default:
-					logprintf("sscanf warning: Unknown format specifier '%c', skipping.", *(format - 1));
+					SscanfWarning("Unknown format specifier '%c', skipping.", *(format - 1));
 					break;
 			}
 			// Don't need any cleanup here.
@@ -1205,12 +1226,12 @@ static cell AMX_NATIVE_CALL
 				{
 					if (*format == '}')
 					{
-						logprintf("sscanf warning: Not in a quiet section.");
+						SscanfWarning("Not in a quiet section.");
 					}
 					else if (*format != '{')
 					{
 						// Fix the bad display bug.
-						logprintf("sscanf warning: Format specifier does not match parameter count.");
+						SscanfWarning("Format specifier does not match parameter count.");
 					}
 					// Only display it once.
 					break;
@@ -1223,7 +1244,7 @@ static cell AMX_NATIVE_CALL
 					}
 					else
 					{
-						logprintf("sscanf warning: Format specifier does not match parameter count.");
+						SscanfWarning("Format specifier does not match parameter count.");
 						break;
 					}
 				}
@@ -1235,12 +1256,80 @@ static cell AMX_NATIVE_CALL
 	if (!doSave)
 	{
 		// Started a quiet section but never explicitly ended it.
-		logprintf("sscanf warning: Unclosed quiet section.");
+		SscanfWarning("Unclosed quiet section.");
 	}
 	// No more parameters and no more format specifiers which could be read
 	// from - this is a valid return!
 	RestoreOpts(defaultOpts, defaultAlpha, defaultForms);
 	return SSCANF_TRUE_RETURN;
+}
+
+// native sscanf(const data[], const format[], (Float,_}:...);
+static cell AMX_NATIVE_CALL
+	n_sscanf(AMX * amx, cell * params)
+{
+	if (g_iTrueMax == 0)
+	{
+		logprintf("sscanf error: System not initialised.");
+		return SSCANF_FAIL_RETURN;
+	}
+	// Friendly note, the most complex set of specifier additions is:
+	// 
+	//  A<i>(10, 11)[5]
+	// 
+	// In that exact order - type, default, size.  It's very opposite to how
+	// it's done in code, where you would do the eqivalent to:
+	// 
+	//  <i>[5] = {10, 11}
+	// 
+	// But this method is vastly simpler to parse in this context!  Technically
+	// you can, due to legacy support for 'p', do:
+	// 
+	//  Ai(10, 11)[5]
+	// 
+	// But you will get an sscanf warning, and I may remove that ability from
+	// the start - that will mean a new function, but an easy to write one.
+	// In fact the most complex will probably be something like:
+	// 
+	//  E<ifs[32]s[8]d>(10, 12.3, Hello there, Hi, 42)
+	// 
+	// Get the number of parameters passed.  We add one as the indexes are out
+	// by one (OBOE - Out By One Error) due to params[0] being the parameter
+	// count, not an actual parameter.
+	const int
+		paramCount = ((int)params[0] / 4) + 1;
+	// Could add a check for only 3 parameters here - I can't think of a time
+	// when you would not want any return values at all, but that doesn't mean
+	// they don't exist - you could just want to check but not save the format.
+	// Update - that is now a possibility with the '{...}' specifiers.
+	if (paramCount < (4 + 1))
+	{
+		logprintf("sscanf error: Missing required parameters.");
+		return SSCANF_FAIL_RETURN;
+	}
+	// Bacup up the file/line data for nested calls.
+	char
+		* px = gFormat,
+		* pf = gCallFile;
+	int
+		pl = gCallLine;
+	cell *
+		pp = gCallResolve;
+	gFormat = 0;
+	gCallFile = 0;
+	gCallLine = params[2];
+	amx_GetAddr(amx, params[1], &gCallResolve);
+	cell ret = Sscanf(amx, params, paramCount);
+	// Restore and free the error data, if it wasn't constant.
+	if (gCallFile && gCallResolve)
+	{
+		free(gCallFile);
+	}
+	gCallResolve = pp;
+	gCallLine = pl;
+	gCallFile = pf;
+	gFormat = px;
+	return ret;
 }
 
 //#if SSCANF_QUIET
@@ -1307,7 +1396,7 @@ static cell AMX_NATIVE_CALL
 {
 	if (params[0] != 3 * sizeof (cell))
 	{
-		logprintf("sscanf error: SSCANF_Init has incorrect parameters.");
+		SscanfError("SSCANF_Init has incorrect parameters.");
 		g_iTrueMax = 0;
 		return 0;
 	}
@@ -1362,7 +1451,7 @@ static cell AMX_NATIVE_CALL
 {
 	if (params[0] != 3 * sizeof (cell))
 	{
-		logprintf("sscanf error: SSCANF_Join has incorrect parameters.");
+		SscanfError("SSCANF_Join has incorrect parameters.");
 		return 0;
 	}
 	cell
@@ -1378,7 +1467,7 @@ static cell AMX_NATIVE_CALL
 {
 	if (params[0] != 1 * sizeof (cell))
 	{
-		logprintf("sscanf error: SSCANF_Leave has incorrect parameters.");
+		SscanfError("SSCANF_Leave has incorrect parameters.");
 		return 0;
 	}
 	// To be correct for multiple scripts with loads and unloads (unloadfs).
@@ -1391,7 +1480,7 @@ static cell AMX_NATIVE_CALL
 {
 	if (params[0] != 2 * sizeof (cell))
 	{
-		logprintf("sscanf error: SSCANF_Option has incorrect parameters.");
+		SscanfError("SSCANF_Option has incorrect parameters.");
 		return 0;
 	}
 	char *
@@ -1411,7 +1500,7 @@ static cell AMX_NATIVE_CALL
 	//amx_Callback(amx, 0, &result, params);
 	if (params[0] != 2 * sizeof (cell))
 	{
-		logprintf("sscanf error: SSCANF_SetPlayerName has incorrect parameters.");
+		SscanfError("SSCANF_SetPlayerName has incorrect parameters.");
 		return 0;
 	}
 	cell return_val = SetPlayerName(amx, params);

@@ -112,7 +112,7 @@ void
 				}
 				else
 				{
-					logprintf("sscanf error: No option value.");
+					SscanfError("No option value.");
 				}
 		}
 	}
@@ -134,7 +134,7 @@ void
 				}
 				else
 				{
-					logprintf("sscanf error: No option value.");
+					SscanfError("No option value.");
 				}
 		}
 	}
@@ -156,7 +156,7 @@ void
 				}
 				else
 				{
-					logprintf("sscanf error: No option value.");
+					SscanfError("No option value.");
 				}
 		}
 	}
@@ -188,7 +188,7 @@ void
 				}
 				else
 				{
-					logprintf("sscanf error: No option value.");
+					SscanfError("No option value.");
 				}
 		}
 	}
@@ -222,13 +222,13 @@ void
 				}
 				else
 				{
-					logprintf("sscanf error: No option value.");
+					SscanfError("No option value.");
 				}
 		}
 	}
 	else
 	{
-		logprintf("sscanf error: Unknown option name.");
+		SscanfError("Unknown option name.");
 	}
 }
 
@@ -255,13 +255,13 @@ char
 	}
 	if (tmp)
 	{
-		logprintf("sscanf error: Unenclosed specifier parameter.", tmp);
+		SscanfError("Unenclosed specifier parameter.", tmp);
 		++(*format);
 		return ' ';
 	}
 	else
 	{
-		logprintf("sscanf warning: No specified parameter found.");
+		SscanfWarning("No specified parameter found.");
 		return ' ';
 	}
 }
@@ -319,12 +319,12 @@ char *
 		}
 		else
 		{
-			logprintf("sscanf error: Unclosed specifier parameters.");
+			SscanfError("Unclosed specifier parameters.");
 		}
 	}
 	else
 	{
-		logprintf("sscanf error: No specified parameters found.");
+		SscanfError("No specified parameters found.");
 	}
 	*format = cur;
 	return 0;
@@ -939,7 +939,7 @@ bool
 	}
 	else
 	{
-		logprintf("sscanf warning: No default value found.");
+		SscanfWarning("No default value found.");
 	}
 	return false;
 }
@@ -962,7 +962,7 @@ void
 		}
 		else
 		{
-			logprintf("sscanf warning: Unclosed default value.");
+			SscanfWarning("Unclosed default value.");
 		}
 	}
 }
@@ -1009,12 +1009,12 @@ void
 		}
 		else
 		{
-			logprintf("sscanf warning: Unclosed default value.");
+			SscanfWarning("Unclosed default value.");
 		}
 	}
 	else
 	{
-		logprintf("sscanf warning: No default value found.");
+		SscanfWarning("No default value found.");
 	}
 	*data = str;
 }
@@ -1039,11 +1039,11 @@ void
 		// If we get here then the end of the string was reached before the
 		// valid end of the length.
 		*input = str;
-		logprintf("sscanf warning: Missing string length end.");
+		SscanfWarning("Missing string length end.");
 	}
 	else
 	{
-		logprintf("sscanf error: String/array must include a length, please add a destination size.");
+		SscanfError("String/array must include a length, please add a destination size.");
 	}
 }
 
@@ -1077,7 +1077,7 @@ int
 			if (length <= 0)
 			{
 				length = 0;
-				logprintf("sscanf error: Invalid data length.");
+				SscanfError("Invalid data length.");
 			}
 		}
 		if (bracketed && *str == ')')
@@ -1093,7 +1093,7 @@ int
 		else if (*str)
 		{
 			// Invalid character: [numberX]
-			logprintf("sscanf warning: Invalid character in data length.");
+			SscanfWarning("Invalid character in data length.");
 			// Loop through the string till we find an end to the size.
 			while (*(++str))
 			{
@@ -1106,13 +1106,13 @@ int
 			}
 		}
 		// Invalid end: [number
-		logprintf("sscanf warning: Missing length end.");
+		SscanfWarning("Missing length end.");
 		*input = str;
 		return length;
 	}
 	else
 	{
-		logprintf("sscanf error: String/array must include a length, please add a destination size.");
+		SscanfError("String/array must include a length, please add a destination size.");
 		return 0;
 	}
 }

@@ -97,7 +97,7 @@ extern logprintf_t
 	break;
 
 #define OPTIONAL_INVALID \
-	logprintf("sscanf warning: Optional types invalid in array specifiers, consider using 'A'.")
+	SscanfWarning("Optional types invalid in array specifiers, consider using 'A'.")
 
 #define DX(m,n) \
 	OPTIONAL_INVALID;
@@ -258,7 +258,7 @@ int
 		case 'u':
 			if (*type == '[')
 			{
-				logprintf("sscanf warning: User arrays are not supported in arrays.");
+				SscanfWarning("User arrays are not supported in arrays.");
 			}
 			if (defaults)
 			{
@@ -305,7 +305,7 @@ int
 		case 'q':
 			if (*type == '[')
 			{
-				logprintf("sscanf warning: User arrays are not supported in arrays.");
+				SscanfWarning("User arrays are not supported in arrays.");
 			}
 			if (defaults)
 			{
@@ -352,7 +352,7 @@ int
 		case 'r':
 			if (*type == '[')
 			{
-				logprintf("sscanf warning: User arrays are not supported in arrays.");
+				SscanfWarning("User arrays are not supported in arrays.");
 			}
 			if (defaults)
 			{
@@ -395,17 +395,17 @@ int
 			break;
 		case 'A':
 		case 'a':
-			logprintf("sscanf error: Multi-dimensional arrays are not supported.");
+			SscanfError("Multi-dimensional arrays are not supported.");
 			return SSCANF_FAIL_RETURN;
 		case '\'':
-			logprintf("sscanf error: Search strings are not supported in arrays.");
+			SscanfError("Search strings are not supported in arrays.");
 			return SSCANF_FAIL_RETURN;
 		case 'P':
 		case 'p':
-			logprintf("sscanf error: Delimiters are not supported in arrays.");
+			SscanfError("Delimiters are not supported in arrays.");
 			return SSCANF_FAIL_RETURN;
 		case '?':
-			logprintf("sscanf error: Options are not supported in arrays.");
+			SscanfError("Options are not supported in arrays.");
 			return SSCANF_FAIL_RETURN;
 		case 'k':
 			if (defaults)
@@ -436,7 +436,7 @@ int
 			}
 			break;
 		case 's':
-			//logprintf("sscanf error: Strings are not supported in arrays.");
+			//SscanfError("Strings are not supported in arrays.");
 			// Now they are (or rather, now I would like them to be, I've not
 			// actually WRITTEN the code yet...).
 			// This code has to read the memory pointed to by "cptr", which for
@@ -504,7 +504,7 @@ int
 			}
 			//return SSCANF_FAIL_RETURN;
 		case 'z':
-			//logprintf("sscanf error: Strings are not supported in arrays.");
+			//SscanfError("Strings are not supported in arrays.");
 			// Now they are (or rather, now I would like them to be, I've not
 			// actually WRITTEN the code yet...).
 			// This code has to read the memory pointed to by "cptr", which for
@@ -573,10 +573,10 @@ int
 			//return SSCANF_FAIL_RETURN;
 		case '{':
 		case '}':
-			logprintf("sscanf error: Quiet sections are not supported in arrays.");
+			SscanfError("Quiet sections are not supported in arrays.");
 			return SSCANF_FAIL_RETURN;
 		default:
-			logprintf("sscanf error: Unknown format specifier '%c'.", *(type - 1));
+			SscanfError("Unknown format specifier '%c'.", *(type - 1));
 			return SSCANF_FAIL_RETURN;
 	}
 	// Save the end of the string.
@@ -588,7 +588,7 @@ int
 			if (*string)
 			{
 				// Error in format specifier.
-				logprintf("sscanf warning: Invalid values in array defaults.");
+				SscanfWarning("Invalid values in array defaults.");
 			}
 			else
 			{
@@ -632,7 +632,7 @@ int
 		}
 		else if (*string)
 		{
-			logprintf("sscanf warning: Excess array defaults found.");
+			SscanfWarning("Excess array defaults found.");
 		}
 	}
 	else
@@ -725,7 +725,7 @@ DoA_after_loop:
 				if (opts == *defaults && !(*type == 's' || *type == 'z' || *type == 'k'))
 				{
 					// No defaults found.
-					logprintf("sscanf warning: Empty default values.");
+					SscanfWarning("Empty default values.");
 					optional = false;
 				}
 				// Found a valid end.  Make it null for
@@ -737,12 +737,12 @@ DoA_after_loop:
 			}
 			else
 			{
-				logprintf("sscanf warning: Unclosed default value.");
+				SscanfWarning("Unclosed default value.");
 			}
 		}
 		else
 		{
-			logprintf("sscanf warning: No default value found.");
+			SscanfWarning("No default value found.");
 			optional = false;
 		}
 	}

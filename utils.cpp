@@ -382,7 +382,7 @@ bool
 	}
 	else
 	{
-		logprintf("sscanf warning: Unclosed default value.");
+		SscanfWarning("Unclosed default value.");
 	}
 	return true;
 }
