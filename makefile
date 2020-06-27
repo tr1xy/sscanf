@@ -9,7 +9,7 @@ GPP = g++
 GCC = gcc
 SSCANF_OUTFILE = "sscanf.so"
 
-COMPILE_FLAGS = -m32 -fPIC -c -O3 -w -D LINUX -D PROJECT_NAME=\"sscanf\" -I ./SDK/amx/
+COMPILE_FLAGS = -m32 -fPIC -c -O3 -w -D LINUX -D PROJECT_NAME=\"sscanf\" -D HAVE_STDINT_H -I ./SDK/amx/
 
 SSCANF = -D SSCANF $(COMPILE_FLAGS)
 

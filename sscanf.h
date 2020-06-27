@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 typedef
 	void (* logprintf_t)(char *, ...);
 
@@ -70,7 +72,7 @@ typedef
 	while (0)
 
 bool SscanfErrLine();
-typedef long int cell;
+typedef int32_t cell;
 
 extern char
 	* gFormat,
