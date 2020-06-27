@@ -14,7 +14,7 @@
  *  The Original Code is the sscanf 2.0 SA:MP plugin.
  *  
  *  The Initial Developer of the Original Code is Alex "Y_Less" Cole.
- *  Portions created by the Initial Developer are Copyright (c) 2019
+ *  Portions created by the Initial Developer are Copyright (c) 2020
  *  the Initial Developer. All Rights Reserved.
  *  
  *  Contributor(s):

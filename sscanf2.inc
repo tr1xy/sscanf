@@ -1,5 +1,5 @@
 /*
- *  sscanf 2.8.3
+ *  sscanf 2.10.0
  *  Created by Y_Less, updated by Emmet_.
  *
  *  Version: MPL 1.1
@@ -17,7 +17,7 @@
  *  The Original Code is the sscanf 2.0 SA:MP plugin.
  *
  *  The Initial Developer of the Original Code is Alex "Y_Less" Cole.
- *  Portions created by the Initial Developer are Copyright (C) 2010
+ *  Portions created by the Initial Developer are Copyright (C) 2020
  *  the Initial Developer. All Rights Reserved.
  *
  *  Contributor(s):
