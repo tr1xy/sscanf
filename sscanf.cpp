@@ -1387,7 +1387,7 @@ static cell AMX_NATIVE_CALL
 	gCallFile = 0;
 	gCallLine = params[2];
 	amx_GetAddr(amx, params[1], &gCallResolve);
-	cell ret = Sscanf(amx, params + 2, paramCount);
+	cell ret = Sscanf(amx, params + 2, paramCount - 2);
 	// Restore and free the error data, if it wasn't constant.
 	if (gCallFile && gCallResolve)
 	{
