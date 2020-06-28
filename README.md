@@ -1427,3 +1427,7 @@ You edited something in the sscanf2 include - undo it or redownload it.
 
 * Plugin backwards-compatability with older includes.
 
+### sscanf 2.10.2 - 28/06/2020
+
+* Fix bug in parameter counts.
+

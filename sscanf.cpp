@@ -1436,7 +1436,7 @@ PLUGIN_EXPORT bool PLUGIN_CALL
 	logprintf("\n");
 	logprintf(" ===============================\n");
 	logprintf("      sscanf plugin loaded.     \n");
-	logprintf("        Version:  2.10.1        \n");
+	logprintf("        Version:  2.10.2        \n");
 	logprintf("   (c) 2020 Alex \"Y_Less\" Cole  \n");
 	logprintf(" ===============================\n");
 
